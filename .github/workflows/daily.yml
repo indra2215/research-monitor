@@ -1,0 +1,41 @@
+name: Daily Research Monitor
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  run-monitor:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Monitor Script
+        env:
+          TELEGRAMTOKEN: ${{ secrets.TELEGRAMTOKEN }}
+          CHARTID: ${{ secrets.CHARTID }}
+          S2_API_KEY: ${{ secrets.S2_API_KEY }}
+        run: python monitor.py
+
+      - name: Commit updated seen.json
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add seen.json || true
+          git commit -m "Update seen memory" || echo "No changes to commit"
+          git push

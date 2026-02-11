@@ -1,0 +1,17 @@
+{
+  "domains": {
+    "crystal_ai": [
+      "crystal structure prediction",
+      "materials informatics",
+      "graph neural networks materials"
+    ],
+    "battery": [
+      "solid state battery",
+      "lithium diffusion modeling"
+    ],
+    "ml_general": [
+      "diffusion model",
+      "transformer materials science"
+    ]
+  }
+}
