@@ -2,6 +2,7 @@ import requests
 import feedparser
 import json
 import os
+import urllib.parse
 from datetime import datetime, timedelta
 
 # ==========================================
@@ -22,7 +23,7 @@ for domain in config["domains"].values():
     keywords.extend(domain)
 
 # ==========================================
-# MEMORY HANDLING
+# MEMORY FILE
 # ==========================================
 SEEN_FILE = "seen.json"
 
@@ -39,7 +40,7 @@ def save_seen():
 # ==========================================
 # SETTINGS
 # ==========================================
-DAYS_BACK = 3   # Only consider last 3 days
+DAYS_BACK = 3
 DATE_THRESHOLD = datetime.utcnow() - timedelta(days=DAYS_BACK)
 
 # ==========================================
@@ -78,6 +79,10 @@ def classify(score):
 # TELEGRAM
 # ==========================================
 def send_telegram(message):
+    if not TELEGRAM_TOKEN or not CHAT_ID:
+        print("Telegram credentials missing.")
+        return
+
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     requests.post(url, json={
         "chat_id": CHAT_ID,
@@ -86,7 +91,7 @@ def send_telegram(message):
     })
 
 # ==========================================
-# PROCESS & FILTER
+# COMMON PROCESSOR
 # ==========================================
 def process_item(title, link, abstract="", citation=0, published_date=None):
     if not link or link in seen_links:
@@ -111,13 +116,23 @@ def check_arxiv():
     results = []
 
     for batch in chunk_keywords(keywords, 20):
-        query = " OR ".join([f'all:"{kw}"' for kw in batch])
-        url = f"http://export.arxiv.org/api/query?search_query={query}&sortBy=lastUpdatedDate&max_results=10"
+        raw_query = " OR ".join([f'all:"{kw}"' for kw in batch])
+        encoded_query = urllib.parse.quote(raw_query)
+
+        url = (
+            f"http://export.arxiv.org/api/query?"
+            f"search_query={encoded_query}&"
+            f"sortBy=lastUpdatedDate&max_results=10"
+        )
 
         feed = feedparser.parse(url)
 
         for entry in feed.entries:
+            if not hasattr(entry, "published_parsed"):
+                continue
+
             published = datetime(*entry.published_parsed[:6])
+
             item = process_item(
                 entry.title,
                 entry.link,
@@ -125,6 +140,7 @@ def check_arxiv():
                 0,
                 published
             )
+
             if item:
                 results.append(item)
 
@@ -137,8 +153,10 @@ def check_openalex():
     results = []
 
     for batch in chunk_keywords(keywords, 20):
-        query = " OR ".join(batch)
-        url = f"https://api.openalex.org/works?search={query}&per-page=10"
+        raw_query = " OR ".join(batch)
+        encoded_query = urllib.parse.quote(raw_query)
+
+        url = f"https://api.openalex.org/works?search={encoded_query}&per-page=10"
 
         response = requests.get(url)
         data = response.json()
@@ -169,8 +187,10 @@ def check_crossref():
     results = []
 
     for batch in chunk_keywords(keywords, 20):
-        query = " OR ".join(batch)
-        url = f"https://api.crossref.org/works?query={query}&rows=10"
+        raw_query = " OR ".join(batch)
+        encoded_query = urllib.parse.quote(raw_query)
+
+        url = f"https://api.crossref.org/works?query={encoded_query}&rows=10"
 
         response = requests.get(url)
         data = response.json()
@@ -183,8 +203,11 @@ def check_crossref():
             pub_parts = item.get("published-print", {}).get("date-parts")
             published = None
             if pub_parts:
-                y, m, d = pub_parts[0]
-                published = datetime(y, m, d)
+                try:
+                    y, m, d = pub_parts[0]
+                    published = datetime(y, m, d)
+                except:
+                    pass
 
             result = process_item(title, link, "", citation, published)
             if result:
@@ -203,11 +226,11 @@ def check_semantic():
     headers = {"x-api-key": S2_API_KEY}
 
     for batch in chunk_keywords(keywords, 20):
-        query = " OR ".join(batch)
+        raw_query = " OR ".join(batch)
 
         url = "https://api.semanticscholar.org/graph/v1/paper/search"
         params = {
-            "query": query,
+            "query": raw_query,
             "limit": 10,
             "fields": "title,abstract,url,citationCount,year"
         }
