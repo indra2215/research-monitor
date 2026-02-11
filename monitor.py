@@ -6,7 +6,7 @@ import urllib.parse
 from datetime import datetime, timedelta
 
 # ==========================================
-# ENV VARIABLES (MATCH YOUR GITHUB SECRETS)
+# ENV VARIABLES
 # ==========================================
 TELEGRAM_TOKEN = os.getenv("TELEGRAMTOKEN")
 CHAT_ID = os.getenv("CHARTID")
@@ -23,7 +23,7 @@ for domain in config["domains"].values():
     keywords.extend(domain)
 
 # ==========================================
-# MEMORY FILE
+# MEMORY
 # ==========================================
 SEEN_FILE = "seen.json"
 
@@ -42,6 +42,7 @@ def save_seen():
 # ==========================================
 DAYS_BACK = 3
 DATE_THRESHOLD = datetime.utcnow() - timedelta(days=DAYS_BACK)
+MAX_MESSAGE_LENGTH = 3900  # Telegram safe limit
 
 # ==========================================
 # BATCHING
@@ -79,24 +80,22 @@ def classify(score):
 # TELEGRAM
 # ==========================================
 def send_telegram(message):
-    print("TOKEN:", TELEGRAM_TOKEN)
-    print("CHAT:", CHAT_ID)
-    print("MESSAGE LENGTH:", len(message))
-
     if not TELEGRAM_TOKEN or not CHAT_ID:
         print("Telegram credentials missing.")
         return
 
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
 
-    response = requests.post(url, json={
-        "chat_id": CHAT_ID,
-        "text": message,
-        "parse_mode": "Markdown"
-    })
+    # Split message if too long
+    chunks = [message[i:i+MAX_MESSAGE_LENGTH] for i in range(0, len(message), MAX_MESSAGE_LENGTH)]
 
-    print("Telegram API response:", response.text)
-
+    for chunk in chunks:
+        response = requests.post(url, json={
+            "chat_id": CHAT_ID,
+            "text": chunk,
+            "parse_mode": "Markdown"
+        })
+        print("Telegram response:", response.text)
 
 # ==========================================
 # COMMON PROCESSOR
@@ -224,7 +223,7 @@ def check_crossref():
     return results
 
 # ==========================================
-# SEMANTIC SCHOLAR (OPTIONAL)
+# SEMANTIC SCHOLAR
 # ==========================================
 def check_semantic():
     if not S2_API_KEY:
@@ -278,7 +277,7 @@ def main():
     if not results:
         message += "No significant updates in the last 3 days."
     else:
-        message += "\n".join(results[:20])
+        message += "\n".join(results[:10])  # limit to 10 results
 
     send_telegram(message)
     save_seen()
