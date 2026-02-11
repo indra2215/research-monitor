@@ -79,16 +79,24 @@ def classify(score):
 # TELEGRAM
 # ==========================================
 def send_telegram(message):
+    print("TOKEN:", TELEGRAM_TOKEN)
+    print("CHAT:", CHAT_ID)
+    print("MESSAGE LENGTH:", len(message))
+
     if not TELEGRAM_TOKEN or not CHAT_ID:
         print("Telegram credentials missing.")
         return
 
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-    requests.post(url, json={
+
+    response = requests.post(url, json={
         "chat_id": CHAT_ID,
         "text": message,
         "parse_mode": "Markdown"
     })
+
+    print("Telegram API response:", response.text)
+
 
 # ==========================================
 # COMMON PROCESSOR
