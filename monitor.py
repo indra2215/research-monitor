@@ -14,13 +14,12 @@ SPRINGER_API_KEY = os.getenv("SPRINGER_API_KEY")
 CONFIG_PATH = "config.json"
 SEEN_FILE = "seen.json"
 REPORT_DATA_FILE = "report_data.json"
-HTML_OUTPUT = "report.html"
+HTML_OUTPUT = "index.html"   # IMPORTANT: Pages default
 
 DAYS_BACK = 180
 DATE_THRESHOLD = datetime.utcnow() - timedelta(days=DAYS_BACK)
 FROM_DATE = DATE_THRESHOLD.strftime("%Y-%m-%d")
 
-CHAR_BUDGET = 3200
 DISCORD_LIMIT = 1900
 HTTP_TIMEOUT = 15
 
@@ -38,20 +37,21 @@ for k, v in domains.items():
 ai_keywords = domains.get("ai_methods", [])
 
 # ================= MEMORY =================
-def load_seen():
-    if os.path.exists(SEEN_FILE):
+def load_json_file(path, default):
+    if os.path.exists(path):
         try:
-            with open(SEEN_FILE, "r") as f:
-                return set(json.load(f))
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
         except:
-            return set()
-    return set()
+            return default
+    return default
 
-seen = load_seen()
+def save_json_file(path, data):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
 
-def save_seen():
-    with open(SEEN_FILE, "w") as f:
-        json.dump(list(seen), f)
+seen = set(load_json_file(SEEN_FILE, []))
+report_data = load_json_file(REPORT_DATA_FILE, [])
 
 def normalize_key(doi=None, url=None):
     if doi:
@@ -74,9 +74,10 @@ def build_query(m_count=12, a_count=8):
     a_part = "(" + " OR ".join(ai_keywords[:a_count]) + ")"
     return f"{m_part} AND {a_part}"
 
-# ================= SOURCES =================
+# ================= OPENALEX =================
 def check_openalex():
     results = []
+
     query = build_query()
     encoded = urllib.parse.quote(query)
 
@@ -96,7 +97,7 @@ def check_openalex():
         title = w.get("title")
         pub_date = w.get("publication_date")
 
-        if not pub_date:
+        if not title or not pub_date:
             continue
 
         pub_dt = datetime.strptime(pub_date, "%Y-%m-%d")
@@ -115,6 +116,7 @@ def check_openalex():
             continue
 
         seen.add(key)
+
         results.append({
             "source": "OpenAlex",
             "title": title,
@@ -124,85 +126,76 @@ def check_openalex():
 
     return results
 
-# ================= REPORT DATA STORAGE =================
-def load_report_data():
-    if os.path.exists(REPORT_DATA_FILE):
-        try:
-            with open(REPORT_DATA_FILE, "r") as f:
-                return json.load(f)
-        except:
-            return []
-    return []
-
-def save_report_data(data):
-    with open(REPORT_DATA_FILE, "w") as f:
-        json.dump(data, f, indent=2)
-
 # ================= HTML DASHBOARD =================
 def generate_html(data, utc, ist):
-    total = len(data)
+
+    data_sorted = sorted(data, key=lambda x: x["date"], reverse=True)
 
     by_source = {}
-    for item in data:
+    for item in data_sorted:
         by_source[item["source"]] = by_source.get(item["source"], 0) + 1
 
     html = f"""
-    <html>
-    <head>
-        <title>AI + Materials Intelligence</title>
-        <style>
-            body {{
-                font-family: Arial;
-                background-color: #f4f6f9;
-                margin: 40px;
-            }}
-            h1 {{
-                color: #0A3D62;
-            }}
-            .stats {{
-                background: white;
-                padding: 15px;
-                border-radius: 8px;
-                margin-bottom: 20px;
-            }}
-            .card {{
-                background: white;
-                padding: 12px;
-                margin-bottom: 10px;
-                border-left: 4px solid #0A3D62;
-                border-radius: 6px;
-            }}
-            .small {{
-                color: #666;
-                font-size: 12px;
-            }}
-        </style>
-    </head>
-    <body>
-        <h1>AI + Materials Intelligence Dashboard</h1>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>AI + Materials Intelligence</title>
+<style>
+body {{
+    font-family: Arial;
+    background: #0f172a;
+    color: #e2e8f0;
+    margin: 40px;
+}}
+h1 {{
+    color: #38bdf8;
+}}
+.stats {{
+    background: #1e293b;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}}
+.card {{
+    background: #1e293b;
+    padding: 12px;
+    margin-bottom: 12px;
+    border-left: 4px solid #38bdf8;
+    border-radius: 8px;
+}}
+.small {{
+    font-size: 12px;
+    color: #94a3b8;
+}}
+</style>
+</head>
+<body>
 
-        <div class="stats">
-            <b>UTC:</b> {utc}<br>
-            <b>IST:</b> {ist}<br>
-            <b>Window:</b> Last {DAYS_BACK} Days<br>
-            <b>Total Findings:</b> {total}<br><br>
-            <b>By Source:</b><br>
-    """
+<h1>AI + Materials Intelligence Dashboard</h1>
+
+<div class="stats">
+<b>UTC:</b> {utc}<br>
+<b>IST:</b> {ist}<br>
+<b>Window:</b> Last {DAYS_BACK} Days<br>
+<b>Total Stored:</b> {len(data_sorted)}<br><br>
+<b>By Source:</b><br>
+"""
 
     for src, count in by_source.items():
         html += f"{src}: {count}<br>"
 
     html += "</div>"
 
-    for item in sorted(data, key=lambda x: x["date"], reverse=True):
+    for item in data_sorted:
         html += f"""
-        <div class="card">
-            <b>{item['title']}</b><br>
-            Source: {item['source']}<br>
-            Journal: {item['journal']}<br>
-            <span class="small">Published: {item['date']}</span>
-        </div>
-        """
+<div class="card">
+<b>{item['title']}</b><br>
+Source: {item['source']}<br>
+Journal: {item['journal']}<br>
+<span class="small">Published: {item['date']}</span>
+</div>
+"""
 
     html += "</body></html>"
 
@@ -226,35 +219,38 @@ def send_discord(msg):
 
 # ================= MAIN =================
 def main():
+
     utc = datetime.utcnow()
     ist = utc + timedelta(hours=5, minutes=30)
 
     new_results = check_openalex()
 
-    existing_data = load_report_data()
+    # Deduplicate report_data
+    existing_keys = {(item["title"], item["date"]) for item in report_data}
 
-    # Merge new results
     for item in new_results:
-        existing_data.append(item)
+        if (item["title"], item["date"]) not in existing_keys:
+            report_data.append(item)
 
-    save_report_data(existing_data)
-    save_seen()
+    save_json_file(SEEN_FILE, list(seen))
+    save_json_file(REPORT_DATA_FILE, report_data)
 
-    # Message
     msg = f"""
 AI + Materials Intelligence
 
-UTC: {utc}
-IST: {ist}
+UTC: {utc.strftime('%Y-%m-%d %H:%M:%S')}
+IST: {ist.strftime('%Y-%m-%d %H:%M:%S')}
 
 New Findings: {len(new_results)}
-Total Stored: {len(existing_data)}
+Total Stored: {len(report_data)}
 """
 
     send_telegram(msg)
     send_discord(msg)
 
-    generate_html(existing_data, utc, ist)
+    generate_html(report_data,
+                  utc.strftime('%Y-%m-%d %H:%M:%S'),
+                  ist.strftime('%Y-%m-%d %H:%M:%S'))
 
 if __name__ == "__main__":
     main()
