@@ -4,46 +4,97 @@
 <head>
 <meta charset="UTF-8">
 <title>AI + Materials Intelligence</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 body {
-    font-family: Arial;
+    margin:0;
+    font-family: 'Segoe UI', sans-serif;
     background: #0f172a;
     color: #e2e8f0;
-    margin: 40px;
 }
-h1 {
-    color: #38bdf8;
+
+.header {
+    padding: 30px;
+    background: #020617;
+    border-bottom: 1px solid #1e293b;
 }
-.stats {
-    background: #1e293b;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 20px;
+
+.container {
+    padding: 40px;
 }
+
+.kpi-grid {
+    display:flex;
+    gap:20px;
+    margin-bottom:30px;
+}
+
+.kpi {
+    flex:1;
+    background:#1e293b;
+    padding:20px;
+    border-radius:12px;
+}
+
 .card {
-    background: #1e293b;
-    padding: 12px;
-    margin-bottom: 12px;
-    border-left: 4px solid #38bdf8;
-    border-radius: 8px;
+    background:#1e293b;
+    padding:18px;
+    margin-bottom:15px;
+    border-radius:12px;
+    transition:0.2s;
 }
+
+.card:hover {
+    background:#273549;
+}
+
 .small {
-    font-size: 12px;
-    color: #94a3b8;
+    font-size:12px;
+    color:#94a3b8;
+}
+
+.search-box {
+    padding:10px;
+    width:100%;
+    margin-bottom:20px;
+    border-radius:8px;
+    border:none;
 }
 </style>
 </head>
+
 <body>
 
+<div class="header">
 <h1>AI + Materials Intelligence Dashboard</h1>
+<div class="small">UTC: 2026-02-12 16:51:19 | IST: 2026-02-12 22:21:19</div>
+</div>
 
-<div class="stats">
-<b>UTC:</b> 2026-02-12 16:44:22<br>
-<b>IST:</b> 2026-02-12 22:14:22<br>
-<b>Window:</b> Last 180 Days<br>
-<b>Total Stored:</b> 50<br><br>
-<b>By Source:</b><br>
-OpenAlex: 50<br></div>
+<div class="container">
+
+<div class="kpi-grid">
+<div class="kpi">
+<h2>50</h2>
+<div>Total Papers (180 Days)</div>
+</div>
+
+<div class="kpi">
+<h2>1</h2>
+<div>Last 30 Days</div>
+</div>
+
+<div class="kpi">
+<h2>1</h2>
+<div>Active Sources</div>
+</div>
+</div>
+
+<input class="search-box" type="text" id="searchInput" placeholder="Search papers..." onkeyup="filterPapers()">
+
+<canvas id="sourceChart" height="100"></canvas>
+
+<div id="paperList">
+
 <div class="card">
 <b>Review : Friction Stir Welding Process and Process Parameters</b><br>
 Source: OpenAlex<br>
@@ -393,4 +444,35 @@ Source: OpenAlex<br>
 Journal: The Journal of Physical Chemistry Letters<br>
 <span class="small">Published: 2025-08-17</span>
 </div>
-</body></html>
+
+</div>
+</div>
+
+<script>
+const ctx = document.getElementById('sourceChart');
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['OpenAlex'],
+        datasets: [{
+            label: 'Papers by Source',
+            data: [50],
+        }]
+    }
+});
+
+function filterPapers() {
+    const input = document.getElementById("searchInput");
+    const filter = input.value.toLowerCase();
+    const cards = document.getElementsByClassName("card");
+
+    for (let i = 0; i < cards.length; i++) {
+        const text = cards[i].innerText.toLowerCase();
+        cards[i].style.display = text.includes(filter) ? "" : "none";
+    }
+}
+</script>
+
+</body>
+</html>
