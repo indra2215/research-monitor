@@ -79,6 +79,24 @@ def safe_get(url, params=None, headers=None):
             else:
                 print("Request failed:", url, e)
     return None
+#discord webhook--integration
+
+DISCORD_WEBHOOK = os.getenv("DISCORD_WEBHOOK")
+
+def send_discord(message):
+    if not DISCORD_WEBHOOK:
+        print("Discord webhook missing.")
+        return
+
+    chunks = [message[i:i+1900] for i in range(0, len(message), 1900)]
+
+    for chunk in chunks:
+        try:
+            r = requests.post(DISCORD_WEBHOOK, json={"content": chunk})
+            print("Discord response:", r.status_code)
+        except Exception as e:
+            print("Discord error:", e)
+
 
 # =========================
 # SCORING
@@ -311,6 +329,7 @@ Memory Size : {len(seen_links)}
         message += "\nNo new relevant research in the last 3 days.\n"
 
     send_telegram(message)
+    send_discord(message)
     save_seen()
 
     print("Run completed.")
