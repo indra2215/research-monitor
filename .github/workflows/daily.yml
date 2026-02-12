@@ -2,18 +2,21 @@ name: Daily Research Monitor
 
 on:
   schedule:
+    # 10:00 AM IST = 04:30 UTC
     - cron: '30 4 * * *'
   workflow_dispatch:
 
 jobs:
   run-monitor:
     runs-on: ubuntu-latest
+    concurrency:
+      group: research-monitor
+      cancel-in-progress: false
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
-          persist-credentials: true
           fetch-depth: 0
 
       - name: Set up Python
@@ -26,15 +29,18 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Ensure seen.json exists
+        run: |
+          if [ ! -f seen.json ]; then
+            echo "[]" > seen.json
+          fi
+
       - name: Run Monitor Script
         env:
           TELEGRAMTOKEN: ${{ secrets.TELEGRAMTOKEN }}
           CHARTID: ${{ secrets.CHARTID }}
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          S2_API_KEY: ${{ secrets.S2_API_KEY }}
           SPRINGER_API_KEY: ${{ secrets.SPRINGER_API_KEY }}
-          MATERIALS_PROJECT_API_KEY: ${{ secrets.MATERIALS_PROJECT_API_KEY }}
-          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
         run: python monitor.py
 
       - name: Commit updated seen.json
@@ -42,10 +48,10 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
 
+          # Pull latest before committing (prevents race corruption)
+          git pull --rebase origin main
+
           git add seen.json || true
           git commit -m "Update seen memory" || echo "No changes to commit"
-
-          # Pull latest changes to avoid race condition
-          git pull --rebase origin main
 
           git push origin main
