@@ -14,7 +14,7 @@ DISCORD_WEBHOOK = os.getenv("DISCORD_WEBHOOK")
 CONFIG_PATH = "config.json"
 SEEN_FILE = "seen.json"
 
-DAYS_BACK = 14
+DAYS_BACK = 180
 DATE_THRESHOLD = datetime.utcnow() - timedelta(days=DAYS_BACK)
 
 CHAR_BUDGET = 3200   # strict message size control
