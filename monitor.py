@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 TELEGRAM_TOKEN = os.getenv("TELEGRAMTOKEN")
 CHAT_ID = os.getenv("CHARTID")
 DISCORD_WEBHOOK = os.getenv("DISCORD_WEBHOOK")
+SPRINGER_API_KEY = os.getenv("SPRINGER_API_KEY")
 
 CONFIG_PATH = "config.json"
 SEEN_FILE = "seen.json"
@@ -17,7 +18,7 @@ SEEN_FILE = "seen.json"
 DAYS_BACK = 180
 DATE_THRESHOLD = datetime.utcnow() - timedelta(days=DAYS_BACK)
 
-CHAR_BUDGET = 3200   # strict message size control
+CHAR_BUDGET = 3200
 HTTP_TIMEOUT = 10
 
 # ================= LOAD CONFIG =================
@@ -52,9 +53,8 @@ def contains(text, keyword):
     pattern = r'\b' + re.escape(keyword.lower()) + r'\b'
     return re.search(pattern, text.lower()) is not None
 
-def classify_paper(title, abstract=""):
+def classify(title, abstract=""):
     text = (title + " " + abstract).lower()
-
     material_match = any(contains(text, kw) for kw in material_keywords)
     ai_match = any(contains(text, kw) for kw in ai_keywords)
 
@@ -64,22 +64,13 @@ def classify_paper(title, abstract=""):
         return "Materials-Only"
     return None
 
-def safe_get(url):
+def safe_get(url, params=None, headers=None):
     try:
-        r = requests.get(url, timeout=HTTP_TIMEOUT)
+        r = requests.get(url, params=params, headers=headers, timeout=HTTP_TIMEOUT)
         r.raise_for_status()
         return r
     except:
         return None
-
-def is_recent(entry):
-    if hasattr(entry, "published_parsed"):
-        try:
-            pub = datetime(*entry.published_parsed[:6])
-            return pub >= DATE_THRESHOLD
-        except:
-            return True
-    return True
 
 def normalize(link):
     return link.strip().lower()
@@ -87,34 +78,135 @@ def normalize(link):
 # ================= ARXIV =================
 def check_arxiv():
     results = []
-
-    # Strict AND query for AI + Materials
-    material_query = "(" + " OR ".join(material_keywords[:20]) + ")"
-    ai_query = "(" + " OR ".join(ai_keywords[:15]) + ")"
-
-    full_query = urllib.parse.quote(f"{material_query} AND {ai_query}")
-
-    url = f"http://export.arxiv.org/api/query?search_query=all:{full_query}&sortBy=lastUpdatedDate&max_results=30"
+    query = urllib.parse.quote(" OR ".join(material_keywords[:30]))
+    url = f"http://export.arxiv.org/api/query?search_query=all:{query}&sortBy=lastUpdatedDate&max_results=50"
 
     r = safe_get(url)
     if not r:
-        return []
+        return results
 
     feed = feedparser.parse(r.content)
 
     for e in feed.entries:
-        if not is_recent(e):
-            continue
+        if hasattr(e, "published_parsed"):
+            pub = datetime(*e.published_parsed[:6])
+            if pub < DATE_THRESHOLD:
+                continue
 
         link = normalize(e.link)
+        if link in seen_links:
+            continue
+
+        cat = classify(e.title, e.summary)
+        if cat:
+            seen_links.add(link)
+            results.append((cat, link))
+
+    return results
+
+# ================= SPRINGER =================
+def check_springer():
+    if not SPRINGER_API_KEY:
+        return []
+
+    results = []
+
+    query = " OR ".join(material_keywords[:30])
+    url = "https://api.springernature.com/meta/v2/json"
+    params = {
+        "q": query,
+        "p": 50,
+        "api_key": SPRINGER_API_KEY
+    }
+
+    r = safe_get(url, params=params)
+    if not r:
+        return results
+
+    data = r.json()
+
+    for rec in data.get("records", []):
+        title = rec.get("title", "")
+        abstract = rec.get("abstract", "")
+        doi = rec.get("doi")
+
+        if not doi:
+            continue
+
+        link = normalize(f"https://doi.org/{doi}")
 
         if link in seen_links:
             continue
 
-        category = classify_paper(e.title, e.summary)
-        if category:
+        cat = classify(title, abstract)
+        if cat:
             seen_links.add(link)
-            results.append((category, link))
+            results.append((cat, link))
+
+    return results
+
+# ================= OPENALEX =================
+def check_openalex():
+    results = []
+
+    query = urllib.parse.quote(" OR ".join(material_keywords[:30]))
+    url = f"https://api.openalex.org/works?search={query}&per-page=50"
+
+    r = safe_get(url)
+    if not r:
+        return results
+
+    data = r.json()
+
+    for work in data.get("results", []):
+        title = work.get("title", "")
+        abstract = ""
+        doi = work.get("doi")
+
+        if not doi:
+            continue
+
+        link = normalize(f"https://doi.org/{doi}")
+
+        if link in seen_links:
+            continue
+
+        cat = classify(title, abstract)
+        if cat:
+            seen_links.add(link)
+            results.append((cat, link))
+
+    return results
+
+# ================= CROSSREF =================
+def check_crossref():
+    results = []
+
+    query = urllib.parse.quote(" OR ".join(material_keywords[:30]))
+    url = f"https://api.crossref.org/works?query={query}&rows=50"
+
+    r = safe_get(url)
+    if not r:
+        return results
+
+    data = r.json()
+
+    for item in data.get("message", {}).get("items", []):
+        title = (item.get("title") or [""])[0]
+        doi = item.get("DOI")
+
+        if not doi:
+            continue
+
+        link = normalize(f"https://doi.org/{doi}")
+
+        if link in seen_links:
+            continue
+
+        cat = classify(title)
+        if cat:
+            seen_links.add(link)
+            results.append((cat, link))
 
     return results
 
@@ -122,12 +214,8 @@ def check_arxiv():
 def send_telegram(msg):
     if not TELEGRAM_TOKEN or not CHAT_ID:
         return
-
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-
-    chunks = [msg[i:i+3500] for i in range(0, len(msg), 3500)]
-    for c in chunks:
-        requests.post(url, json={"chat_id": CHAT_ID, "text": c})
+    requests.post(url, json={"chat_id": CHAT_ID, "text": msg})
 
 # ================= DISCORD =================
 def send_discord(msg):
@@ -140,17 +228,21 @@ def main():
     utc = datetime.utcnow()
     ist = utc + timedelta(hours=5, minutes=30)
 
-    collected = check_arxiv()
+    collected = []
+    for func in [check_arxiv, check_springer, check_openalex, check_crossref]:
+        try:
+            collected += func()
+        except:
+            continue
 
     # Remove duplicates preserving order
-    temp_seen = set()
+    temp = set()
     unique = []
     for cat, link in collected:
-        if link not in temp_seen:
-            temp_seen.add(link)
+        if link not in temp:
+            temp.add(link)
             unique.append((cat, link))
 
-    # Prioritize AI+Materials
     primary = [r for r in unique if r[0] == "AI+Materials"]
     secondary = [r for r in unique if r[0] == "Materials-Only"]
 
@@ -163,24 +255,25 @@ Daily Research Intelligence
 
 UTC : {utc.strftime('%Y-%m-%d %H:%M:%S')}
 IST : {ist.strftime('%Y-%m-%d %H:%M:%S')}
+Window : Last {DAYS_BACK} Days
 
-AI+Materials Found : {len(primary)}
-Materials-Only Found : {len(secondary)}
+AI+Materials : {len(primary)}
+Materials-Only : {len(secondary)}
 
 --------------------------------
 """
 
-    used_chars = len(msg)
+    used = len(msg)
 
     for cat, link in ranked:
         line = f"[{cat}] {link}\n"
-        if used_chars + len(line) > CHAR_BUDGET:
+        if used + len(line) > CHAR_BUDGET:
             break
         msg += line
-        used_chars += len(line)
+        used += len(line)
 
-    if len(ranked) == 0:
-        msg += "\nNo relevant AI-integrated materials research found in last 14 days.\n"
+    if not ranked:
+        msg += "\nNo relevant AI-integrated materials research found.\n"
 
     send_telegram(msg)
     send_discord(msg)
