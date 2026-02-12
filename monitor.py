@@ -7,7 +7,7 @@ import time
 from datetime import datetime, timedelta
 
 # =========================
-# ENV / CONFIG
+# ENV VARIABLES
 # =========================
 TELEGRAM_TOKEN = os.getenv("TELEGRAMTOKEN")
 CHAT_ID = os.getenv("CHARTID")
@@ -16,18 +16,21 @@ S2_API_KEY = os.getenv("S2_API_KEY")
 CONFIG_PATH = "config.json"
 SEEN_FILE = "seen.json"
 
-# Behavior
+# =========================
+# SETTINGS
+# =========================
 DAYS_BACK = 3
-DATE_THRESHOLD = datetime.utcnow() - timedelta(days=DAYS_BACK)
 BATCH_SIZE = 20
 MAX_MESSAGE_LENGTH = 3900
 RESULTS_LIMIT = 10
-HTTP_TIMEOUT = 10  # seconds
+HTTP_TIMEOUT = 10
 RETRY_COUNT = 2
-RETRY_BACKOFF = 2  # seconds
+RETRY_BACKOFF = 2
+
+DATE_THRESHOLD = datetime.utcnow() - timedelta(days=DAYS_BACK)
 
 # =========================
-# Load keywords
+# LOAD KEYWORDS
 # =========================
 if not os.path.exists(CONFIG_PATH):
     raise SystemExit("Missing config.json")
@@ -38,286 +41,279 @@ with open(CONFIG_PATH, "r", encoding="utf-8") as f:
 keywords = []
 for domain in config.get("domains", {}).values():
     keywords.extend(domain)
-# flatten and dedupe lightly
-keywords = list(dict.fromkeys([k.strip() for k in keywords if k and isinstance(k, str)]))
+
+keywords = list(dict.fromkeys([k.strip() for k in keywords if k]))
 
 # =========================
-# Memory (seen links)
+# MEMORY
 # =========================
 if os.path.exists(SEEN_FILE):
     try:
         with open(SEEN_FILE, "r", encoding="utf-8") as f:
             seen_links = set(json.load(f))
-    except Exception:
+    except:
         seen_links = set()
 else:
     seen_links = set()
 
 def save_seen():
-    try:
-        with open(SEEN_FILE, "w", encoding="utf-8") as f:
-            json.dump(list(seen_links), f)
-    except Exception as e:
-        print("Error saving seen.json:", e)
+    with open(SEEN_FILE, "w", encoding="utf-8") as f:
+        json.dump(list(seen_links), f)
 
 # =========================
-# Utilities
+# UTILITIES
 # =========================
 def chunk_keywords(lst, size=BATCH_SIZE):
     for i in range(0, len(lst), size):
         yield lst[i:i + size]
 
 def safe_get(url, params=None, headers=None):
-    last_exc = None
     for attempt in range(RETRY_COUNT + 1):
         try:
             r = requests.get(url, params=params, headers=headers, timeout=HTTP_TIMEOUT)
             r.raise_for_status()
             return r
         except Exception as e:
-            last_exc = e
             if attempt < RETRY_COUNT:
-                time.sleep(RETRY_BACKOFF * (attempt + 1))
+                time.sleep(RETRY_BACKOFF)
             else:
-                print(f"Request failed: {url} error: {e}")
+                print("Request failed:", url, e)
     return None
 
 # =========================
-# Scoring & classification
+# SCORING
 # =========================
 def score_text(title, abstract="", citation_count=0):
     score = 0
-    text = (title + " " + (abstract or "")).lower()
+    text = (title + " " + abstract).lower()
+
     for kw in keywords:
-        k = kw.lower()
-        if k in title.lower():
+        if kw.lower() in title.lower():
             score += 5
-        if k in text:
+        if kw.lower() in text:
             score += 3
-    if citation_count and citation_count > 10:
-        score += 2
+
+    if citation_count > 5:
+        score += 1
+
     return score
 
 def classify(score):
-    if score >= 10:
+    if score >= 8:
         return "HIGH"
-    if score >= 5:
+    if score >= 3:
         return "MEDIUM"
     return None
 
 # =========================
-# Telegram sender (no Markdown)
+# TELEGRAM
 # =========================
 def send_telegram(message):
     if not TELEGRAM_TOKEN or not CHAT_ID:
-        print("Telegram credentials missing. Check GitHub secrets.")
+        print("Telegram credentials missing.")
         return
-
-    # do not print token anywhere
-    print("Telegram CHAT_ID:", CHAT_ID)
-    print("Full message length:", len(message))
 
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
 
-    # split if too long
-    chunks = [message[i:i + MAX_MESSAGE_LENGTH] for i in range(0, len(message), MAX_MESSAGE_LENGTH)]
+    chunks = [message[i:i+MAX_MESSAGE_LENGTH] for i in range(0, len(message), MAX_MESSAGE_LENGTH)]
+
     for chunk in chunks:
         try:
-            resp = requests.post(url, json={"chat_id": CHAT_ID, "text": chunk}, timeout=HTTP_TIMEOUT)
-            try:
-                print("Telegram response:", resp.status_code, resp.text)
-            except Exception:
-                print("Telegram response status:", resp.status_code)
+            r = requests.post(url, json={
+                "chat_id": CHAT_ID,
+                "text": chunk
+            }, timeout=HTTP_TIMEOUT)
+            print("Telegram response:", r.status_code)
         except Exception as e:
-            print("Failed to send to Telegram:", e)
+            print("Telegram error:", e)
 
 # =========================
-# Process item & dedupe
+# PROCESS ITEM
 # =========================
 def process_item(title, link, abstract="", citation=0, published_date=None):
     if not link:
         return None
-    # use canonical link string
-    link_key = link.strip()
-    if link_key in seen_links:
+
+    if link in seen_links:
         return None
+
     if published_date and published_date < DATE_THRESHOLD:
         return None
-    score = score_text(title, abstract or "", citation)
-    lvl = classify(score)
-    if lvl:
-        seen_links.add(link_key)
-        # No markdown, simple bracket label to avoid parsing errors
-        return f"[{lvl}] {title}\n{link_key}\n"
+
+    score = score_text(title, abstract, citation)
+    level = classify(score)
+
+    if level:
+        seen_links.add(link)
+        return f"[{level}] {title}\n{link}\n"
+
     return None
 
 # =========================
-# Source: arXiv
+# SOURCES
 # =========================
 def check_arxiv():
     items = []
     base = "http://export.arxiv.org/api/query"
+
     for batch in chunk_keywords(keywords):
-        raw_query = " OR ".join([f'all:"{kw}"' for kw in batch])
-        encoded = urllib.parse.quote(raw_query, safe='')
+        query = " OR ".join([f'all:"{kw}"' for kw in batch])
+        encoded = urllib.parse.quote(query, safe='')
         url = f"{base}?search_query={encoded}&sortBy=lastUpdatedDate&max_results=10"
-        try:
-            r = safe_get(url)
-            if not r:
+
+        r = safe_get(url)
+        if not r:
+            continue
+
+        feed = feedparser.parse(r.content)
+
+        for entry in feed.entries:
+            if not hasattr(entry, "published_parsed"):
                 continue
-            feed = feedparser.parse(r.content)
-            for entry in feed.entries:
-                if not hasattr(entry, "published_parsed"):
-                    continue
-                try:
-                    published = datetime(*entry.published_parsed[:6])
-                except Exception:
-                    published = None
-                item = process_item(entry.title, getattr(entry, "link", ""), getattr(entry, "summary", ""), 0, published)
-                if item:
-                    items.append(item)
-        except Exception as e:
-            print("arXiv batch error:", e)
+
+            try:
+                published = datetime(*entry.published_parsed[:6])
+            except:
+                published = None
+
+            item = process_item(entry.title, entry.link, entry.summary, 0, published)
+            if item:
+                items.append(item)
+
     return items
 
-# =========================
-# Source: OpenAlex
-# =========================
 def check_openalex():
     items = []
     base = "https://api.openalex.org/works"
+
     for batch in chunk_keywords(keywords):
-        raw_query = " OR ".join(batch)
-        encoded = urllib.parse.quote(raw_query, safe='')
-        url = f"{base}?search={encoded}&per-page=10"
+        query = urllib.parse.quote(" OR ".join(batch), safe='')
+        url = f"{base}?search={query}&per-page=10"
+
         r = safe_get(url)
         if not r:
             continue
-        try:
-            data = r.json()
-        except Exception:
-            print("OpenAlex: invalid JSON")
-            continue
+
+        data = r.json()
+
         for w in data.get("results", []):
-            title = w.get("title", "") or ""
-            link = w.get("id", "") or ""
-            citation = w.get("cited_by_count", 0) or 0
-            pub_date_str = w.get("publication_date")
+            title = w.get("title", "")
+            link = w.get("id", "")
+            citation = w.get("cited_by_count", 0)
+
+            pub_date = w.get("publication_date")
             published = None
-            if pub_date_str:
+            if pub_date:
                 try:
-                    published = datetime.strptime(pub_date_str, "%Y-%m-%d")
-                except Exception:
-                    published = None
+                    published = datetime.strptime(pub_date, "%Y-%m-%d")
+                except:
+                    pass
+
             item = process_item(title, link, "", citation, published)
             if item:
                 items.append(item)
+
     return items
 
-# =========================
-# Source: Crossref
-# =========================
 def check_crossref():
     items = []
     base = "https://api.crossref.org/works"
+
     for batch in chunk_keywords(keywords):
-        raw_query = " OR ".join(batch)
-        encoded = urllib.parse.quote(raw_query, safe='')
-        url = f"{base}?query={encoded}&rows=10"
+        query = urllib.parse.quote(" OR ".join(batch), safe='')
+        url = f"{base}?query={query}&rows=10"
+
         r = safe_get(url)
         if not r:
             continue
-        try:
-            data = r.json()
-        except Exception:
-            print("Crossref: invalid JSON")
-            continue
+
+        data = r.json()
+
         for it in data.get("message", {}).get("items", []):
             title = (it.get("title") or [""])[0]
-            link = it.get("URL", "") or ""
-            citation = it.get("is-referenced-by-count", 0) or 0
-            published = None
-            pub_parts = (it.get("published-print", {}) or {}).get("date-parts") or []
-            if pub_parts:
-                try:
-                    y, m, d = (pub_parts[0] + [1, 1, 1])[:3]
-                    published = datetime(int(y), int(m), int(d))
-                except Exception:
-                    published = None
-            item = process_item(title, link, "", citation, published)
+            link = it.get("URL", "")
+            citation = it.get("is-referenced-by-count", 0)
+
+            item = process_item(title, link, "", citation, None)
             if item:
                 items.append(item)
+
     return items
 
-# =========================
-# Source: Semantic Scholar (optional)
-# =========================
 def check_semantic():
     if not S2_API_KEY:
         return []
+
     items = []
     headers = {"x-api-key": S2_API_KEY}
-    base = "https://api.semanticscholar.org/graph/v1/paper/search"
+    url = "https://api.semanticscholar.org/graph/v1/paper/search"
+
     for batch in chunk_keywords(keywords):
-        raw_query = " OR ".join(batch)
-        params = {"query": raw_query, "limit": 10, "fields": "title,abstract,url,citationCount,year"}
-        r = safe_get(base, params=params, headers=headers)
+        params = {
+            "query": " OR ".join(batch),
+            "limit": 10,
+            "fields": "title,url,citationCount,year"
+        }
+
+        r = safe_get(url, params=params, headers=headers)
         if not r:
             continue
-        try:
-            data = r.json()
-        except Exception:
-            print("Semantic Scholar: invalid JSON")
-            continue
-        for paper in data.get("data", []):
-            title = paper.get("title", "") or ""
-            link = paper.get("url", "") or ""
-            abstract = paper.get("abstract", "") or ""
-            citation = paper.get("citationCount", 0) or 0
-            published = None
-            if paper.get("year"):
-                try:
-                    published = datetime(int(paper["year"]), 1, 1)
-                except Exception:
-                    published = None
-            item = process_item(title, link, abstract, citation, published)
+
+        data = r.json()
+
+        for p in data.get("data", []):
+            title = p.get("title", "")
+            link = p.get("url", "")
+            citation = p.get("citationCount", 0)
+
+            item = process_item(title, link, "", citation, None)
             if item:
                 items.append(item)
+
     return items
 
 # =========================
-# Main
+# MAIN
 # =========================
 def main():
-    print("Monitor run starting. Keywords:", len(keywords))
+    utc_now = datetime.utcnow()
+    ist_now = utc_now + timedelta(hours=5, minutes=30)
+
     results = []
-    try:
-        results += check_arxiv()
-        results += check_openalex()
-        results += check_crossref()
-        results += check_semantic()
-    except Exception as e:
-        print("Unexpected error during checks:", e)
+    sources_checked = 0
 
-    # Keep order but limit number of results
-    if not results:
-        message = "Daily Research Monitor\n\nNo significant updates in the last 3 days."
+    for func in [check_arxiv, check_openalex, check_crossref, check_semantic]:
+        results += func()
+        sources_checked += 1
+
+    unique_results = list(dict.fromkeys(results))[:RESULTS_LIMIT]
+
+    message = f"""
+==============================
+Daily Research Monitor Report
+==============================
+
+UTC Time : {utc_now.strftime('%Y-%m-%d %H:%M:%S')}
+IST Time : {ist_now.strftime('%Y-%m-%d %H:%M:%S')}
+
+Keywords Loaded : {len(keywords)}
+API Sources Checked : {sources_checked}
+Relevant Matches Found : {len(unique_results)}
+Memory Size : {len(seen_links)}
+
+--------------------------------
+"""
+
+    if unique_results:
+        message += "\nRecent Related Findings:\n\n"
+        message += "\n".join(unique_results)
     else:
-        # de-duplicate results text while preserving order (links were already deduped)
-        seen_text = set()
-        unique = []
-        for r in results:
-            if r not in seen_text:
-                unique.append(r)
-                seen_text.add(r)
-        trimmed = unique[:RESULTS_LIMIT]
-        message = "Daily Research Monitor\n\n" + "\n".join(trimmed)
+        message += "\nNo new relevant research in the last 3 days.\n"
 
-    # Send message(s)
     send_telegram(message)
-    # Persist memory
     save_seen()
-    print("Monitor run finished. Sent items:", len(results))
+
+    print("Run completed.")
 
 if __name__ == "__main__":
     main()
