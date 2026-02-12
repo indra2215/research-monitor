@@ -3,43 +3,76 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>AI + Materials Intelligence</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crystal Research Intelligence</title>
+
 <style>
 body {
     margin:0;
-    font-family: 'Segoe UI', sans-serif;
-    background: #0f172a;
-    color: #e2e8f0;
+    font-family:Segoe UI;
+    background:#0f172a;
+    color:#e2e8f0;
 }
 
 .header {
-    padding: 30px;
-    background: #020617;
-    border-bottom: 1px solid #1e293b;
+    padding:25px;
+    background:linear-gradient(90deg,#020617,#0f172a);
+    text-align:center;
+}
+
+.logo {
+    font-size:22px;
+    font-weight:bold;
+    letter-spacing:1px;
+    color:#38bdf8;
+}
+
+.subtitle {
+    font-size:13px;
+    color:#94a3b8;
+    margin-top:6px;
 }
 
 .container {
-    padding: 40px;
+    padding:20px;
+    max-width:900px;
+    margin:auto;
 }
 
 .kpi-grid {
     display:flex;
-    gap:20px;
-    margin-bottom:30px;
+    flex-wrap:wrap;
+    gap:15px;
+    margin-bottom:25px;
 }
 
 .kpi {
     flex:1;
+    min-width:150px;
     background:#1e293b;
-    padding:20px;
+    padding:18px;
     border-radius:12px;
+    text-align:center;
+}
+
+.kpi h2 {
+    margin:0;
+    color:#38bdf8;
+}
+
+.search {
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    border:none;
+    margin-bottom:20px;
+    font-size:14px;
 }
 
 .card {
     background:#1e293b;
     padding:18px;
-    margin-bottom:15px;
+    margin-bottom:14px;
     border-radius:12px;
     transition:0.2s;
 }
@@ -53,12 +86,10 @@ body {
     color:#94a3b8;
 }
 
-.search-box {
-    padding:10px;
-    width:100%;
-    margin-bottom:20px;
-    border-radius:8px;
-    border:none;
+@media(max-width:600px){
+    .kpi-grid {
+        flex-direction:column;
+    }
 }
 </style>
 </head>
@@ -66,15 +97,17 @@ body {
 <body>
 
 <div class="header">
-<h1>AI + Materials Intelligence Dashboard</h1>
-<div class="small">UTC: 2026-02-12 16:51:19 | IST: 2026-02-12 22:21:19</div>
+<div class="logo">🔷 Crystal Research Intelligence</div>
+<div class="subtitle">
+UTC: 2026-02-12 17:18:13 | IST: 2026-02-12 22:48:13
+</div>
 </div>
 
 <div class="container">
 
 <div class="kpi-grid">
 <div class="kpi">
-<h2>50</h2>
+<h2>99</h2>
 <div>Total Papers (180 Days)</div>
 </div>
 
@@ -89,9 +122,7 @@ body {
 </div>
 </div>
 
-<input class="search-box" type="text" id="searchInput" placeholder="Search papers..." onkeyup="filterPapers()">
-
-<canvas id="sourceChart" height="100"></canvas>
+<input type="text" id="searchBox" class="search" placeholder="Search papers by title or journal...">
 
 <div id="paperList">
 
@@ -103,6 +134,223 @@ Journal: International Journal of Scientific Research in Mechanical and Material
 </div>
 
 <div class="card">
+<b>ZENN: A thermodynamics-inspired computational framework for heterogeneous data–driven modeling</b><br>
+Source: OpenAlex<br>
+Journal: Proceedings of the National Academy of Sciences<br>
+<span class="small">Published: 2026-01-02</span>
+</div>
+
+<div class="card">
+<b>Explainable AI for Structure–Property Analysis of FDM-Printed Biodegradable Polymer Nanocomposites</b><br>
+Source: OpenAlex<br>
+Journal: Journal of Composites and Biodegradable Polymers<br>
+<span class="small">Published: 2025-12-30</span>
+</div>
+
+<div class="card">
+<b>Forecasting Daily Ambient PM2.5 Concentrations in Qingdao City Using Deep Learning and Hybrid Interpretable Models and Analysis of Driving Factors Using SHAP</b><br>
+Source: OpenAlex<br>
+Journal: Toxics<br>
+<span class="small">Published: 2025-12-30</span>
+</div>
+
+<div class="card">
+<b>A critical review on electronic materials properties and multifunctional applications</b><br>
+Source: OpenAlex<br>
+Journal: Discover Materials<br>
+<span class="small">Published: 2025-12-26</span>
+</div>
+
+<div class="card">
+<b>Machine Learning Prediction for Experimental Quench Voltage of HTS Coils Using a Combined Framework With Time-Series Generative Adversarial Network and Long Short-Term Memory Techniques</b><br>
+Source: OpenAlex<br>
+Journal: IEEE Transactions on Applied Superconductivity<br>
+<span class="small">Published: 2025-12-23</span>
+</div>
+
+<div class="card">
+<b>Performance Monitoring of Photovoltaic Modules Using Machine‐Learning‐Based Solutions: A Survey of Current Trends</b><br>
+Source: OpenAlex<br>
+Journal: Energy Science & Engineering<br>
+<span class="small">Published: 2025-12-22</span>
+</div>
+
+<div class="card">
+<b>Research on Direct Air Capture: A Review</b><br>
+Source: OpenAlex<br>
+Journal: Energies<br>
+<span class="small">Published: 2025-12-18</span>
+</div>
+
+<div class="card">
+<b>Influence Mechanism of Rock Compressive Mechanical Properties Under Freeze-Thaw Cycles: Insights from Machine Learning</b><br>
+Source: OpenAlex<br>
+Journal: Big Data and Cognitive Computing<br>
+<span class="small">Published: 2025-12-16</span>
+</div>
+
+<div class="card">
+<b>Integrated AI Framework for Room-Temperature Atom Manipulation in Scanning Probe Microscopy</b><br>
+Source: OpenAlex<br>
+Journal: Nano Letters<br>
+<span class="small">Published: 2025-12-16</span>
+</div>
+
+<div class="card">
+<b>Physics-guided quench detection framework for HTS coils based on augmentation of artificial quench data: a comprehensive benchmarking investigation on 75 different machine learning and dimensionality reduction techniques</b><br>
+Source: OpenAlex<br>
+Journal: Superconductor Science and Technology<br>
+<span class="small">Published: 2025-12-01</span>
+</div>
+
+<div class="card">
+<b>An AI-aided carbon conversion framework for efficient carbon storage</b><br>
+Source: OpenAlex<br>
+Journal: Journal of King Saud University - Engineering Sciences<br>
+<span class="small">Published: 2025-12-01</span>
+</div>
+
+<div class="card">
+<b>Predictive Models Based on Artificial Intelligence to Estimate Crop Yield: A Literature Review</b><br>
+Source: OpenAlex<br>
+Journal: Agriculture<br>
+<span class="small">Published: 2025-11-26</span>
+</div>
+
+<div class="card">
+<b>Interpretable deep learning models for independent fertilizer and crop recommendation</b><br>
+Source: OpenAlex<br>
+Journal: Scientific Reports<br>
+<span class="small">Published: 2025-11-24</span>
+</div>
+
+<div class="card">
+<b>Sensitivity Analysis and Potential Prediction of Heavy Oil Reservoirs Under Different Steam Flooding Methods</b><br>
+Source: OpenAlex<br>
+Journal: Processes<br>
+<span class="small">Published: 2025-11-21</span>
+</div>
+
+<div class="card">
+<b>Advances in Battery Modeling and Management Systems: A Comprehensive Review of Techniques, Challenges, and Future Perspectives</b><br>
+Source: OpenAlex<br>
+Journal: Batteries<br>
+<span class="small">Published: 2025-11-20</span>
+</div>
+
+<div class="card">
+<b>Physics-constrained deep learning framework for accurate AC loss prediction of high-temperature superconductors: impact of data scarcity and extrapolation beyond the range of experimental measurements</b><br>
+Source: OpenAlex<br>
+Journal: Superconductor Science and Technology<br>
+<span class="small">Published: 2025-11-19</span>
+</div>
+
+<div class="card">
+<b>Streamflow forecasting using machine learning and remote sensing data in the Himalayan region</b><br>
+Source: OpenAlex<br>
+Journal: Water Practice & Technology<br>
+<span class="small">Published: 2025-11-17</span>
+</div>
+
+<div class="card">
+<b>An AI-Driven Thermal-Fluid Testbed for Advanced Small Modular Reactors: Integration of Digital Twin and Large Language Models</b><br>
+Source: OpenAlex<br>
+Journal: AI Thermal Fluids<br>
+<span class="small">Published: 2025-11-06</span>
+</div>
+
+<div class="card">
+<b>A Comparative Study on AI-Predicted vs Actual Kick Detection in High-Pressure Wells</b><br>
+Source: OpenAlex<br>
+Journal: Unknown<br>
+<span class="small">Published: 2025-11-03</span>
+</div>
+
+<div class="card">
+<b>Hybrid Thermodynamic and Machine Learning Optimization of Plate Heat Exchanger Performance for Brewery Cooling Systems in Uganda</b><br>
+Source: OpenAlex<br>
+Journal: Open Research Africa<br>
+<span class="small">Published: 2025-11-03</span>
+</div>
+
+<div class="card">
+<b>Artificial Decision Tree Guided Screening of Ultralong Room‐Temperature Phosphorescent Cocrystals with Locally Excited States</b><br>
+Source: OpenAlex<br>
+Journal: Angewandte Chemie International Edition<br>
+<span class="small">Published: 2025-11-02</span>
+</div>
+
+<div class="card">
+<b>Analyzing heat and mass transfer of nanofluid flow on a stenosed artery applying endo-exothermic chemical reaction and bioconvection using a model-agnostic meta-learner technique: A numerical approach</b><br>
+Source: OpenAlex<br>
+Journal: International Journal of Thermofluids<br>
+<span class="small">Published: 2025-11-01</span>
+</div>
+
+<div class="card">
+<b>Real-time soil fertility analysis, crop prediction, and insights using machine learning and deep learning algorithms</b><br>
+Source: OpenAlex<br>
+Journal: Frontiers in Soil Science<br>
+<span class="small">Published: 2025-10-31</span>
+</div>
+
+<div class="card">
+<b>AI-Enhanced Real-Time Turbidity Monitoring System Using Machine Learning</b><br>
+Source: OpenAlex<br>
+Journal: INTERANTIONAL JOURNAL OF SCIENTIFIC RESEARCH IN ENGINEERING AND MANAGEMENT<br>
+<span class="small">Published: 2025-10-31</span>
+</div>
+
+<div class="card">
+<b>Multi-dimensional optical remote sensing in agriculture: Spectral, angular, and spatial scaling for crop stress monitoring</b><br>
+Source: OpenAlex<br>
+Journal: Smart Agricultural Technology<br>
+<span class="small">Published: 2025-10-28</span>
+</div>
+
+<div class="card">
+<b>Predictive modeling of thermal conductivity in PCM composites using artificial Intelligence</b><br>
+Source: OpenAlex<br>
+Journal: Sustainable Chemistry for Climate Action<br>
+<span class="small">Published: 2025-10-22</span>
+</div>
+
+<div class="card">
+<b>Wildfire Susceptibility Mapping Using Deep Learning and Machine Learning Models Based on Multi-Sensor Satellite Data Fusion: A Case Study of Serbia</b><br>
+Source: OpenAlex<br>
+Journal: Fire<br>
+<span class="small">Published: 2025-10-20</span>
+</div>
+
+<div class="card">
+<b>On the applicability of speckle pattern imaging combined with AI for raw milk classification</b><br>
+Source: OpenAlex<br>
+Journal: Measurement<br>
+<span class="small">Published: 2025-10-10</span>
+</div>
+
+<div class="card">
+<b>CFD Modelling of Prevention and Mitigation of Coal Spontaneous Combustion in Longwall Goaf - A Comprehensive Review and Future Outlook</b><br>
+Source: OpenAlex<br>
+Journal: Archives of Computational Methods in Engineering<br>
+<span class="small">Published: 2025-10-10</span>
+</div>
+
+<div class="card">
+<b>Predicting crop disease severity using real time weather variability through machine learning algorithms</b><br>
+Source: OpenAlex<br>
+Journal: Scientific Reports<br>
+<span class="small">Published: 2025-10-06</span>
+</div>
+
+<div class="card">
+<b>Green MnFe₂O₄/g-C₃N₄ Nanoparticles for Pb(II) Treatment in Contaminated Water: Experimental Insights and Machine Learning Integration</b><br>
+Source: OpenAlex<br>
+Journal: Water Air & Soil Pollution<br>
+<span class="small">Published: 2025-10-03</span>
+</div>
+
+<div class="card">
 <b>ImaginateAR: AI-Assisted In-Situ Authoring in Augmented Reality</b><br>
 Source: OpenAlex<br>
 Journal: Unknown<br>
@@ -110,9 +358,37 @@ Journal: Unknown<br>
 </div>
 
 <div class="card">
+<b>Hybrid random forest– artificial neural network model based forecasting of anthracnose in bottle gourd across different transplanting windows</b><br>
+Source: OpenAlex<br>
+Journal: Smart Agricultural Technology<br>
+<span class="small">Published: 2025-09-27</span>
+</div>
+
+<div class="card">
+<b>Machine learning techniques for marine heatwave prediction: a comprehensive review</b><br>
+Source: OpenAlex<br>
+Journal: Intelligent Marine Technology and Systems<br>
+<span class="small">Published: 2025-09-26</span>
+</div>
+
+<div class="card">
+<b>Advanced data-driven insights into melt pool morphology in multi-layer direct metal deposition</b><br>
+Source: OpenAlex<br>
+Journal: The International Journal of Advanced Manufacturing Technology<br>
+<span class="small">Published: 2025-09-26</span>
+</div>
+
+<div class="card">
 <b>Investigating the Potential of Kepler Towards Power Observability for Sustainable Cloud Computing</b><br>
 Source: OpenAlex<br>
 Journal: Unknown<br>
+<span class="small">Published: 2025-09-19</span>
+</div>
+
+<div class="card">
+<b>Statistical and ANN Modeling of Corrosion Behavior of Austenitic Stainless Steels in Aqueous Environments</b><br>
+Source: OpenAlex<br>
+Journal: Materials<br>
 <span class="small">Published: 2025-09-19</span>
 </div>
 
@@ -127,6 +403,13 @@ Journal: Antibiotics<br>
 <b>Regenerative potential of immune cells after traumatic muscle injury</b><br>
 Source: OpenAlex<br>
 Journal: Frontiers in Immunology<br>
+<span class="small">Published: 2025-09-17</span>
+</div>
+
+<div class="card">
+<b>DeepSeek-R1 incentivizes reasoning in LLMs through reinforcement learning</b><br>
+Source: OpenAlex<br>
+Journal: Nature<br>
 <span class="small">Published: 2025-09-17</span>
 </div>
 
@@ -163,6 +446,13 @@ Journal: International Journal of Healthcare Information Systems and Informatics
 Source: OpenAlex<br>
 Journal: Sensors<br>
 <span class="small">Published: 2025-09-13</span>
+</div>
+
+<div class="card">
+<b>Low-Temperature Electrolytes for Lithium-Ion Batteries: Current Challenges, Development, and Perspectives</b><br>
+Source: OpenAlex<br>
+Journal: Nano-Micro Letters<br>
+<span class="small">Published: 2025-09-12</span>
 </div>
 
 <div class="card">
@@ -243,6 +533,13 @@ Journal: Sensors<br>
 </div>
 
 <div class="card">
+<b>Dynamic performance evaluation and machine learning-assisted optimization of a solar-driven system integrated with PCM-based thermal energy storage: A case study approach</b><br>
+Source: OpenAlex<br>
+Journal: Thermal Science and Engineering Progress<br>
+<span class="small">Published: 2025-09-05</span>
+</div>
+
+<div class="card">
 <b>From Stripes to Hexagons: Strain‐Induced 2D Pb Phases Confined Between Graphene and SiC</b><br>
 Source: OpenAlex<br>
 Journal: Advanced Materials Interfaces<br>
@@ -254,6 +551,20 @@ Journal: Advanced Materials Interfaces<br>
 Source: OpenAlex<br>
 Journal: Machines<br>
 <span class="small">Published: 2025-09-03</span>
+</div>
+
+<div class="card">
+<b>A Thin and Self‐Adaptive Artificial Skin Based on Hierarchical Supramolecular Interactions for Multimodal Mental Monitoring</b><br>
+Source: OpenAlex<br>
+Journal: Advanced Functional Materials<br>
+<span class="small">Published: 2025-09-02</span>
+</div>
+
+<div class="card">
+<b>Linear and Symmetric Artificial Synapses Driven by Hydrogen Bonding for Accurate and Reliable Neuromorphic Computing</b><br>
+Source: OpenAlex<br>
+Journal: Advanced Materials<br>
+<span class="small">Published: 2025-09-01</span>
 </div>
 
 <div class="card">
@@ -285,6 +596,13 @@ Journal: International Journal for Research in Applied Science and Engineering T
 </div>
 
 <div class="card">
+<b>An intelligent plant-wide decision-support framework for waste valorization: Optimizing hydrochar production and energy recovery</b><br>
+Source: OpenAlex<br>
+Journal: Fuel Processing Technology<br>
+<span class="small">Published: 2025-08-30</span>
+</div>
+
+<div class="card">
 <b>Research on Thermal Characteristics and Algorithm Prediction Analysis of Liquid Cooling System for Leaf Vein Structure Power Battery</b><br>
 Source: OpenAlex<br>
 Journal: Batteries<br>
@@ -295,6 +613,13 @@ Journal: Batteries<br>
 <b>A Bibliometric Analysis of Strategies for Atherosclerosis Treatment with Organic Nanoparticles</b><br>
 Source: OpenAlex<br>
 Journal: Pharmaceutics<br>
+<span class="small">Published: 2025-08-29</span>
+</div>
+
+<div class="card">
+<b>Climate-Resilient Crops: Integrating AI, Multi-Omics, and Advanced Phenotyping to Address Global Agricultural and Societal Challenges</b><br>
+Source: OpenAlex<br>
+Journal: Plants<br>
 <span class="small">Published: 2025-08-29</span>
 </div>
 
@@ -355,6 +680,13 @@ Journal: Unknown<br>
 </div>
 
 <div class="card">
+<b>Machine learning models for the prediction of hydrogen solubility in aqueous systems</b><br>
+Source: OpenAlex<br>
+Journal: Scientific Reports<br>
+<span class="small">Published: 2025-08-26</span>
+</div>
+
+<div class="card">
 <b>FY24 LDRD Annual Report PDF</b><br>
 Source: OpenAlex<br>
 Journal: Unknown<br>
@@ -376,6 +708,13 @@ Journal: Sensors<br>
 </div>
 
 <div class="card">
+<b>AI-Powered Building Ecosystems: A Narrative Mapping Review on the Integration of Digital Twins and LLMs for Proactive Comfort, IEQ, and Energy Management</b><br>
+Source: OpenAlex<br>
+Journal: Sensors<br>
+<span class="small">Published: 2025-08-24</span>
+</div>
+
+<div class="card">
 <b>Design, Modelling and Simulate of DC motor for Robotics to Enhance Speed and Direction</b><br>
 Source: OpenAlex<br>
 Journal: International Journal for Scientific Research<br>
@@ -387,6 +726,13 @@ Journal: International Journal for Scientific Research<br>
 Source: OpenAlex<br>
 Journal: Unknown<br>
 <span class="small">Published: 2025-08-23</span>
+</div>
+
+<div class="card">
+<b>Sustainable food frying enhanced by AI: A comprehensive review</b><br>
+Source: OpenAlex<br>
+Journal: Food Research International<br>
+<span class="small">Published: 2025-08-22</span>
 </div>
 
 <div class="card">
@@ -439,6 +785,34 @@ Journal: arXiv (Cornell University)<br>
 </div>
 
 <div class="card">
+<b>Projection of ENSO using observation-informed deep learning</b><br>
+Source: OpenAlex<br>
+Journal: Nature Communications<br>
+<span class="small">Published: 2025-08-19</span>
+</div>
+
+<div class="card">
+<b>Energy-efficient in-memory computing with 8T SRAM for arithmetic operations and signal filtering in UAV communications</b><br>
+Source: OpenAlex<br>
+Journal: Systems Science & Control Engineering<br>
+<span class="small">Published: 2025-08-19</span>
+</div>
+
+<div class="card">
+<b>Advancements in artificial intelligence and machine learning for poultry farming: Applications, challenges, and future prospects</b><br>
+Source: OpenAlex<br>
+Journal: Smart Agricultural Technology<br>
+<span class="small">Published: 2025-08-18</span>
+</div>
+
+<div class="card">
+<b>Synaptic plasticity simulates behavior of low-voltage solution-processed Ag-doped CuI thin film transistors</b><br>
+Source: OpenAlex<br>
+Journal: Applied Physics Letters<br>
+<span class="small">Published: 2025-08-18</span>
+</div>
+
+<div class="card">
 <b>Tuning Exciton Diffusion in Organic Semiconductors through Hybridization with Charge-Transfer Excitations</b><br>
 Source: OpenAlex<br>
 Journal: The Journal of Physical Chemistry Letters<br>
@@ -446,32 +820,19 @@ Journal: The Journal of Physical Chemistry Letters<br>
 </div>
 
 </div>
-</div>
 
 <script>
-const ctx = document.getElementById('sourceChart');
+const searchBox = document.getElementById("searchBox");
 
-new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: ['OpenAlex'],
-        datasets: [{
-            label: 'Papers by Source',
-            data: [50],
-        }]
-    }
-});
-
-function filterPapers() {
-    const input = document.getElementById("searchInput");
-    const filter = input.value.toLowerCase();
+searchBox.addEventListener("keyup", function() {
+    const filter = searchBox.value.toLowerCase();
     const cards = document.getElementsByClassName("card");
 
     for (let i = 0; i < cards.length; i++) {
         const text = cards[i].innerText.toLowerCase();
         cards[i].style.display = text.includes(filter) ? "" : "none";
     }
-}
+});
 </script>
 
 </body>

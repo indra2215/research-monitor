@@ -298,5 +298,299 @@
     "title": "SURVEY ON POWER-AWARE TEST SCHEDULING AND SCAN CHAIN OPTIMIZATION IN SOC TESTING",
     "journal": "International Journal of Advanced Research in Computer Science",
     "date": "2025-08-20"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Advances in Battery Modeling and Management Systems: A Comprehensive Review of Techniques, Challenges, and Future Perspectives",
+    "journal": "Batteries",
+    "date": "2025-11-20"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Climate-Resilient Crops: Integrating AI, Multi-Omics, and Advanced Phenotyping to Address Global Agricultural and Societal Challenges",
+    "journal": "Plants",
+    "date": "2025-08-29"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "An AI-Driven Thermal-Fluid Testbed for Advanced Small Modular Reactors: Integration of Digital Twin and Large Language Models",
+    "journal": "AI Thermal Fluids",
+    "date": "2025-11-06"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Interpretable deep learning models for independent fertilizer and crop recommendation",
+    "journal": "Scientific Reports",
+    "date": "2025-11-24"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Advancements in artificial intelligence and machine learning for poultry farming: Applications, challenges, and future prospects",
+    "journal": "Smart Agricultural Technology",
+    "date": "2025-08-18"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Real-time soil fertility analysis, crop prediction, and insights using machine learning and deep learning algorithms",
+    "journal": "Frontiers in Soil Science",
+    "date": "2025-10-31"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Wildfire Susceptibility Mapping Using Deep Learning and Machine Learning Models Based on Multi-Sensor Satellite Data Fusion: A Case Study of Serbia",
+    "journal": "Fire",
+    "date": "2025-10-20"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Linear and Symmetric Artificial Synapses Driven by Hydrogen Bonding for Accurate and Reliable Neuromorphic Computing",
+    "journal": "Advanced Materials",
+    "date": "2025-09-01"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Machine learning models for the prediction of hydrogen solubility in aqueous systems",
+    "journal": "Scientific Reports",
+    "date": "2025-08-26"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Research on Direct Air Capture: A Review",
+    "journal": "Energies",
+    "date": "2025-12-18"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "A Comparative Study on AI-Predicted vs Actual Kick Detection in High-Pressure Wells",
+    "journal": "Unknown",
+    "date": "2025-11-03"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "DeepSeek-R1 incentivizes reasoning in LLMs through reinforcement learning",
+    "journal": "Nature",
+    "date": "2025-09-17"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Artificial Decision Tree Guided Screening of Ultralong Room\u2010Temperature Phosphorescent Cocrystals with Locally Excited States",
+    "journal": "Angewandte Chemie International Edition",
+    "date": "2025-11-02"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Predictive Models Based on Artificial Intelligence to Estimate Crop Yield: A Literature Review",
+    "journal": "Agriculture",
+    "date": "2025-11-26"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "AI-Enhanced Real-Time Turbidity Monitoring System Using Machine Learning",
+    "journal": "INTERANTIONAL JOURNAL OF SCIENTIFIC RESEARCH IN ENGINEERING AND MANAGEMENT",
+    "date": "2025-10-31"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "On the applicability of speckle pattern imaging combined with AI for raw milk classification",
+    "journal": "Measurement",
+    "date": "2025-10-10"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "CFD Modelling of Prevention and Mitigation of Coal Spontaneous Combustion in Longwall Goaf - A Comprehensive Review and Future Outlook",
+    "journal": "Archives of Computational Methods in Engineering",
+    "date": "2025-10-10"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Machine learning techniques for marine heatwave prediction: a comprehensive review",
+    "journal": "Intelligent Marine Technology and Systems",
+    "date": "2025-09-26"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Sustainable food frying enhanced by AI: A comprehensive review",
+    "journal": "Food Research International",
+    "date": "2025-08-22"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "A Thin and Self\u2010Adaptive Artificial Skin Based on Hierarchical Supramolecular Interactions for Multimodal Mental Monitoring",
+    "journal": "Advanced Functional Materials",
+    "date": "2025-09-02"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Low-Temperature Electrolytes for Lithium-Ion Batteries: Current Challenges, Development, and Perspectives",
+    "journal": "Nano-Micro Letters",
+    "date": "2025-09-12"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Projection of ENSO using observation-informed deep learning",
+    "journal": "Nature Communications",
+    "date": "2025-08-19"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "AI-Powered Building Ecosystems: A Narrative Mapping Review on the Integration of Digital Twins and LLMs for Proactive Comfort, IEQ, and Energy Management",
+    "journal": "Sensors",
+    "date": "2025-08-24"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Energy-efficient in-memory computing with 8T SRAM for arithmetic operations and signal filtering in UAV communications",
+    "journal": "Systems Science & Control Engineering",
+    "date": "2025-08-19"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Hybrid random forest\u2013 artificial neural network model based forecasting of anthracnose in bottle gourd across different transplanting windows",
+    "journal": "Smart Agricultural Technology",
+    "date": "2025-09-27"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Streamflow forecasting using machine learning and remote sensing data in the Himalayan region",
+    "journal": "Water Practice & Technology",
+    "date": "2025-11-17"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "ZENN: A thermodynamics-inspired computational framework for heterogeneous data\u2013driven modeling",
+    "journal": "Proceedings of the National Academy of Sciences",
+    "date": "2026-01-02"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Influence Mechanism of Rock Compressive Mechanical Properties Under Freeze-Thaw Cycles: Insights from Machine Learning",
+    "journal": "Big Data and Cognitive Computing",
+    "date": "2025-12-16"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Predictive modeling of thermal conductivity in PCM composites using artificial Intelligence",
+    "journal": "Sustainable Chemistry for Climate Action",
+    "date": "2025-10-22"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Explainable AI for Structure\u2013Property Analysis of FDM-Printed Biodegradable Polymer Nanocomposites",
+    "journal": "Journal of Composites and Biodegradable Polymers",
+    "date": "2025-12-30"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "A critical review on electronic materials properties and multifunctional applications",
+    "journal": "Discover Materials",
+    "date": "2025-12-26"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Physics-constrained deep learning framework for accurate AC loss prediction of high-temperature superconductors: impact of data scarcity and extrapolation beyond the range of experimental measurements",
+    "journal": "Superconductor Science and Technology",
+    "date": "2025-11-19"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Sensitivity Analysis and Potential Prediction of Heavy Oil Reservoirs Under Different Steam Flooding Methods",
+    "journal": "Processes",
+    "date": "2025-11-21"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Dynamic performance evaluation and machine learning-assisted optimization of a solar-driven system integrated with PCM-based thermal energy storage: A case study approach",
+    "journal": "Thermal Science and Engineering Progress",
+    "date": "2025-09-05"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Performance Monitoring of Photovoltaic Modules Using Machine\u2010Learning\u2010Based Solutions: A Survey of Current Trends",
+    "journal": "Energy Science & Engineering",
+    "date": "2025-12-22"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Physics-guided quench detection framework for HTS coils based on augmentation of artificial quench data: a comprehensive benchmarking investigation on 75 different machine learning and dimensionality reduction techniques",
+    "journal": "Superconductor Science and Technology",
+    "date": "2025-12-01"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Machine Learning Prediction for Experimental Quench Voltage of HTS Coils Using a Combined Framework With Time-Series Generative Adversarial Network and Long Short-Term Memory Techniques",
+    "journal": "IEEE Transactions on Applied Superconductivity",
+    "date": "2025-12-23"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Predicting crop disease severity using real time weather variability through machine learning algorithms",
+    "journal": "Scientific Reports",
+    "date": "2025-10-06"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Multi-dimensional optical remote sensing in agriculture: Spectral, angular, and spatial scaling for crop stress monitoring",
+    "journal": "Smart Agricultural Technology",
+    "date": "2025-10-28"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Statistical and ANN Modeling of Corrosion Behavior of Austenitic Stainless Steels in Aqueous Environments",
+    "journal": "Materials",
+    "date": "2025-09-19"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Advanced data-driven insights into melt pool morphology in multi-layer direct metal deposition",
+    "journal": "The International Journal of Advanced Manufacturing Technology",
+    "date": "2025-09-26"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Synaptic plasticity simulates behavior of low-voltage solution-processed Ag-doped CuI thin film transistors",
+    "journal": "Applied Physics Letters",
+    "date": "2025-08-18"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Hybrid Thermodynamic and Machine Learning Optimization of Plate Heat Exchanger Performance for Brewery Cooling Systems in Uganda",
+    "journal": "Open Research Africa",
+    "date": "2025-11-03"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "An AI-aided carbon conversion framework for efficient carbon storage",
+    "journal": "Journal of King Saud University - Engineering Sciences",
+    "date": "2025-12-01"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Green MnFe\u2082O\u2084/g-C\u2083N\u2084 Nanoparticles for Pb(II) Treatment in Contaminated Water: Experimental Insights and Machine Learning Integration",
+    "journal": "Water Air & Soil Pollution",
+    "date": "2025-10-03"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Integrated AI Framework for Room-Temperature Atom Manipulation in Scanning Probe Microscopy",
+    "journal": "Nano Letters",
+    "date": "2025-12-16"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Analyzing heat and mass transfer of nanofluid flow on a stenosed artery applying endo-exothermic chemical reaction and bioconvection using a model-agnostic meta-learner technique: A numerical approach",
+    "journal": "International Journal of Thermofluids",
+    "date": "2025-11-01"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "An intelligent plant-wide decision-support framework for waste valorization: Optimizing hydrochar production and energy recovery",
+    "journal": "Fuel Processing Technology",
+    "date": "2025-08-30"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Forecasting Daily Ambient PM2.5 Concentrations in Qingdao City Using Deep Learning and Hybrid Interpretable Models and Analysis of Driving Factors Using SHAP",
+    "journal": "Toxics",
+    "date": "2025-12-30"
   }
 ]
