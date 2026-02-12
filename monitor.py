@@ -131,6 +131,9 @@ def generate_html(data, utc, ist):
 
     data_sorted = sorted(data, key=lambda x: x["date"], reverse=True)
 
+    total = len(data_sorted)
+    latest_30 = [d for d in data_sorted if d["date"] >= (datetime.utcnow() - timedelta(days=30)).strftime("%Y-%m-%d")]
+
     by_source = {}
     for item in data_sorted:
         by_source[item["source"]] = by_source.get(item["source"], 0) + 1
@@ -141,51 +144,97 @@ def generate_html(data, utc, ist):
 <head>
 <meta charset="UTF-8">
 <title>AI + Materials Intelligence</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 body {{
-    font-family: Arial;
+    margin:0;
+    font-family: 'Segoe UI', sans-serif;
     background: #0f172a;
     color: #e2e8f0;
-    margin: 40px;
 }}
-h1 {{
-    color: #38bdf8;
+
+.header {{
+    padding: 30px;
+    background: #020617;
+    border-bottom: 1px solid #1e293b;
 }}
-.stats {{
-    background: #1e293b;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 20px;
+
+.container {{
+    padding: 40px;
 }}
+
+.kpi-grid {{
+    display:flex;
+    gap:20px;
+    margin-bottom:30px;
+}}
+
+.kpi {{
+    flex:1;
+    background:#1e293b;
+    padding:20px;
+    border-radius:12px;
+}}
+
 .card {{
-    background: #1e293b;
-    padding: 12px;
-    margin-bottom: 12px;
-    border-left: 4px solid #38bdf8;
-    border-radius: 8px;
+    background:#1e293b;
+    padding:18px;
+    margin-bottom:15px;
+    border-radius:12px;
+    transition:0.2s;
 }}
+
+.card:hover {{
+    background:#273549;
+}}
+
 .small {{
-    font-size: 12px;
-    color: #94a3b8;
+    font-size:12px;
+    color:#94a3b8;
+}}
+
+.search-box {{
+    padding:10px;
+    width:100%;
+    margin-bottom:20px;
+    border-radius:8px;
+    border:none;
 }}
 </style>
 </head>
+
 <body>
 
+<div class="header">
 <h1>AI + Materials Intelligence Dashboard</h1>
+<div class="small">UTC: {utc} | IST: {ist}</div>
+</div>
 
-<div class="stats">
-<b>UTC:</b> {utc}<br>
-<b>IST:</b> {ist}<br>
-<b>Window:</b> Last {DAYS_BACK} Days<br>
-<b>Total Stored:</b> {len(data_sorted)}<br><br>
-<b>By Source:</b><br>
+<div class="container">
+
+<div class="kpi-grid">
+<div class="kpi">
+<h2>{total}</h2>
+<div>Total Papers (180 Days)</div>
+</div>
+
+<div class="kpi">
+<h2>{len(latest_30)}</h2>
+<div>Last 30 Days</div>
+</div>
+
+<div class="kpi">
+<h2>{len(by_source)}</h2>
+<div>Active Sources</div>
+</div>
+</div>
+
+<input class="search-box" type="text" id="searchInput" placeholder="Search papers..." onkeyup="filterPapers()">
+
+<canvas id="sourceChart" height="100"></canvas>
+
+<div id="paperList">
 """
-
-    for src, count in by_source.items():
-        html += f"{src}: {count}<br>"
-
-    html += "</div>"
 
     for item in data_sorted:
         html += f"""
@@ -197,7 +246,39 @@ Journal: {item['journal']}<br>
 </div>
 """
 
-    html += "</body></html>"
+    html += f"""
+</div>
+</div>
+
+<script>
+const ctx = document.getElementById('sourceChart');
+
+new Chart(ctx, {{
+    type: 'bar',
+    data: {{
+        labels: {list(by_source.keys())},
+        datasets: [{{
+            label: 'Papers by Source',
+            data: {list(by_source.values())},
+        }}]
+    }}
+}});
+
+function filterPapers() {{
+    const input = document.getElementById("searchInput");
+    const filter = input.value.toLowerCase();
+    const cards = document.getElementsByClassName("card");
+
+    for (let i = 0; i < cards.length; i++) {{
+        const text = cards[i].innerText.toLowerCase();
+        cards[i].style.display = text.includes(filter) ? "" : "none";
+    }}
+}}
+</script>
+
+</body>
+</html>
+"""
 
     with open(HTML_OUTPUT, "w", encoding="utf-8") as f:
         f.write(html)
