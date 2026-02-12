@@ -30,8 +30,11 @@ jobs:
         env:
           TELEGRAMTOKEN: ${{ secrets.TELEGRAMTOKEN }}
           CHARTID: ${{ secrets.CHARTID }}
-          S2_API_KEY: ${{ secrets.S2_API_KEY }}
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          S2_API_KEY: ${{ secrets.S2_API_KEY }}
+          SPRINGER_API_KEY: ${{ secrets.SPRINGER_API_KEY }}
+          MATERIALS_PROJECT_API_KEY: ${{ secrets.MATERIALS_PROJECT_API_KEY }}
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
         run: python monitor.py
 
       - name: Commit updated seen.json
