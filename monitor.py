@@ -18,6 +18,7 @@ DAYS_BACK = 180
 DATE_THRESHOLD = datetime.utcnow() - timedelta(days=DAYS_BACK)
 
 CHAR_BUDGET = 3200
+DISCORD_LIMIT = 1900
 HTTP_TIMEOUT = 12
 
 # ================= LOAD CONFIG =================
@@ -32,10 +33,6 @@ for k, v in domains.items():
         material_keywords.extend(v)
 
 ai_keywords = domains.get("ai_methods", [])
-
-# Remove duplicates
-material_keywords = list(set(material_keywords))
-ai_keywords = list(set(ai_keywords))
 
 # ================= MEMORY =================
 if os.path.exists(SEEN_FILE):
@@ -67,9 +64,9 @@ def safe_get(url, params=None, headers=None):
         return None
 
 # ================= QUERY BUILDER =================
-def build_and_query(materials, ai, m_count=15, a_count=10):
-    m_part = "(" + " OR ".join(materials[:m_count]) + ")"
-    a_part = "(" + " OR ".join(ai[:a_count]) + ")"
+def build_query(m_count=15, a_count=10):
+    m_part = "(" + " OR ".join(material_keywords[:m_count]) + ")"
+    a_part = "(" + " OR ".join(ai_keywords[:a_count]) + ")"
     return f"{m_part} AND {a_part}"
 
 # ================= SPRINGER =================
@@ -78,7 +75,7 @@ def check_springer():
         return []
 
     results = []
-    query = build_and_query(material_keywords, ai_keywords)
+    query = build_query()
 
     params = {
         "q": query,
@@ -88,14 +85,14 @@ def check_springer():
 
     r = safe_get("https://api.springernature.com/meta/v2/json", params=params)
     if not r:
-        return []
+        return results
 
     data = r.json()
 
     for rec in data.get("records", []):
         doi = rec.get("doi")
         title = rec.get("title")
-        journal = rec.get("publicationName")
+        journal = rec.get("publicationName") or "Unknown Journal"
 
         key = normalize_key(doi=doi)
         if not key or key in seen:
@@ -109,21 +106,28 @@ def check_springer():
 # ================= OPENALEX =================
 def check_openalex():
     results = []
-    query = build_and_query(material_keywords, ai_keywords)
+    query = build_query()
     encoded = urllib.parse.quote(query)
 
     url = f"https://api.openalex.org/works?search={encoded}&per-page=50"
 
     r = safe_get(url)
     if not r:
-        return []
+        return results
 
     data = r.json()
 
     for w in data.get("results", []):
         doi = w.get("doi")
         title = w.get("title")
-        journal = (w.get("primary_location") or {}).get("source", {}).get("display_name")
+
+        journal = "Unknown Journal"
+        primary_location = w.get("primary_location")
+
+        if isinstance(primary_location, dict):
+            source = primary_location.get("source")
+            if isinstance(source, dict):
+                journal = source.get("display_name") or journal
 
         key = normalize_key(doi=doi)
         if not key or key in seen:
@@ -137,21 +141,24 @@ def check_openalex():
 # ================= CROSSREF =================
 def check_crossref():
     results = []
-    query = build_and_query(material_keywords, ai_keywords)
+    query = build_query()
     encoded = urllib.parse.quote(query)
 
     url = f"https://api.crossref.org/works?query={encoded}&rows=50"
 
     r = safe_get(url)
     if not r:
-        return []
+        return results
 
     data = r.json()
 
     for item in data.get("message", {}).get("items", []):
         doi = item.get("DOI")
-        title = (item.get("title") or [""])[0]
-        journal = (item.get("container-title") or [""])[0]
+        titles = item.get("title") or []
+        journal_list = item.get("container-title") or []
+
+        title = titles[0] if titles else "Untitled"
+        journal = journal_list[0] if journal_list else "Unknown Journal"
 
         key = normalize_key(doi=doi)
         if not key or key in seen:
@@ -165,14 +172,14 @@ def check_crossref():
 # ================= ARXIV =================
 def check_arxiv():
     results = []
-    query = build_and_query(material_keywords, ai_keywords)
+    query = build_query()
     encoded = urllib.parse.quote(query)
 
     url = f"http://export.arxiv.org/api/query?search_query=all:{encoded}&sortBy=lastUpdatedDate&max_results=40"
 
     r = safe_get(url)
     if not r:
-        return []
+        return results
 
     feed = feedparser.parse(r.content)
 
@@ -186,7 +193,7 @@ def check_arxiv():
         if key in seen:
             continue
 
-        category = entry.tags[0]["term"] if hasattr(entry, "tags") and entry.tags else "N/A"
+        category = entry.tags[0]["term"] if entry.tags else "N/A"
 
         seen.add(key)
         results.append(f"[arXiv] {entry.title}\nCategory: {category}\n")
@@ -196,35 +203,22 @@ def check_arxiv():
 # ================= TELEGRAM =================
 def send_telegram(msg):
     if not TELEGRAM_TOKEN or not CHAT_ID:
-        print("Telegram credentials missing.")
         return
 
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
 
     chunks = [msg[i:i+3500] for i in range(0, len(msg), 3500)]
-
     for chunk in chunks:
-        try:
-            r = requests.post(url, json={"chat_id": CHAT_ID, "text": chunk})
-            print("Telegram status:", r.status_code)
-        except Exception as e:
-            print("Telegram error:", e)
+        requests.post(url, json={"chat_id": CHAT_ID, "text": chunk})
 
 # ================= DISCORD =================
 def send_discord(msg):
     if not DISCORD_WEBHOOK:
-        print("Discord webhook missing.")
         return
 
-    MAX_DISCORD = 1900
-    chunks = [msg[i:i+MAX_DISCORD] for i in range(0, len(msg), MAX_DISCORD)]
-
+    chunks = [msg[i:i+DISCORD_LIMIT] for i in range(0, len(msg), DISCORD_LIMIT)]
     for chunk in chunks:
-        try:
-            r = requests.post(DISCORD_WEBHOOK, json={"content": chunk})
-            print("Discord status:", r.status_code)
-        except Exception as e:
-            print("Discord error:", e)
+        requests.post(DISCORD_WEBHOOK, json={"content": chunk})
 
 # ================= MAIN =================
 def main():
