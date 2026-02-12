@@ -2,7 +2,7 @@ name: Daily Research Monitor
 
 on:
   schedule:
-    - cron: '30 4 * * *'   # 10:00 AM IST
+    - cron: '30 4 * * *'
   workflow_dispatch:
 
 jobs:
@@ -18,9 +18,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Pull latest changes
-        run: |
-          git pull origin main
+      - name: Pull latest
+        run: git pull origin main
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -30,15 +29,14 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install requests feedparser
 
-      - name: Ensure seen.json exists
+      - name: Ensure JSON files exist
         run: |
-          if [ ! -f seen.json ]; then
-            echo "[]" > seen.json
-          fi
+          if [ ! -f seen.json ]; then echo "[]" > seen.json; fi
+          if [ ! -f report_data.json ]; then echo "[]" > report_data.json; fi
 
-      - name: Run Monitor Script
+      - name: Run Monitor
         env:
           TELEGRAMTOKEN: ${{ secrets.TELEGRAMTOKEN }}
           CHARTID: ${{ secrets.CHARTID }}
@@ -46,12 +44,11 @@ jobs:
           SPRINGER_API_KEY: ${{ secrets.SPRINGER_API_KEY }}
         run: python monitor.py
 
-      - name: Commit updated seen.json
+      - name: Commit Updates
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
 
-          git add seen.json || true
-          git commit -m "Update seen memory" || echo "No changes"
-
+          git add seen.json report_data.json index.html || true
+          git commit -m "Auto update research dashboard" || echo "No changes"
           git push origin main
