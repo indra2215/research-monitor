@@ -1,17 +1,60 @@
 {
   "domains": {
-    "crystal_ai": [
-      "crystal structure prediction",
-      "materials informatics",
-      "graph neural networks materials"
+    "superconductors": [
+      "high temperature superconductor",
+      "room temperature superconductor",
+      "cuprate superconductor",
+      "iron based superconductor",
+      "BCS theory",
+      "quantum critical point",
+      "flux pinning",
+      "critical current density",
+      "superconducting gap",
+      "Cooper pair",
+      "Meissner effect",
+      "type II superconductor"
     ],
-    "battery": [
+    "rare_earth_materials": [
+      "rare earth magnet",
+      "neodymium magnet",
+      "lanthanide materials",
+      "rare earth oxides",
+      "yttrium compounds",
+      "dysprosium alloy",
+      "cerium oxide",
+      "rare earth recycling",
+      "rare earth permanent magnet",
+      "magnetic anisotropy"
+    ],
+    "solid_state_batteries": [
+      "solid state electrolyte",
       "solid state battery",
-      "lithium diffusion modeling"
+      "ceramic electrolyte",
+      "sulfide electrolyte",
+      "garnet electrolyte",
+      "lithium lanthanum zirconate",
+      "LLZO",
+      "ionic conductivity",
+      "interfacial resistance",
+      "dendrite suppression",
+      "all solid state battery"
     ],
-    "ml_general": [
-      "diffusion model",
-      "transformer materials science"
+    "li_ion_batteries": [
+      "lithium ion battery",
+      "Li-ion battery",
+      "lithium diffusion",
+      "SEI layer",
+      "solid electrolyte interphase",
+      "anode degradation",
+      "cathode material",
+      "NMC cathode",
+      "lithium metal anode",
+      "battery aging",
+      "capacity fade",
+      "battery cycle life",
+      "electrochemical impedance",
+      "battery thermal runaway",
+      "energy density improvement"
     ]
   }
 }
