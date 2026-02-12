@@ -29,6 +29,7 @@
       "density functional theory",
       "angle-resolved photoemission spectroscopy"
     ],
+
     "rare_earth_materials": [
       "rare earth element",
       "rare earth oxide",
@@ -52,6 +53,7 @@
       "critical material",
       "rare earth recycling"
     ],
+
     "solid_state_batteries": [
       "solid state electrolyte",
       "solid state battery",
@@ -80,6 +82,7 @@
       "state-of-charge estimation",
       "state-of-health prediction"
     ],
+
     "li_ion_batteries": [
       "lithium ion battery",
       "Li-ion battery",
@@ -105,31 +108,31 @@
       "data-driven battery model",
       "state-of-charge",
       "state-of-health"
+    ],
+
+    "ai_methods": [
+      "machine learning",
+      "deep learning",
+      "neural network",
+      "graph neural network",
+      "transformer model",
+      "reinforcement learning",
+      "Bayesian optimization",
+      "materials informatics",
+      "data-driven",
+      "high throughput screening",
+      "computational materials",
+      "AI-assisted",
+      "surrogate model",
+      "predictive modeling",
+      "feature engineering",
+      "regression model",
+      "classification model",
+      "unsupervised learning",
+      "supervised learning",
+      "generative model",
+      "diffusion model",
+      "large language model"
     ]
   }
-  "ai_methods": [
-  "machine learning",
-  "deep learning",
-  "neural network",
-  "graph neural network",
-  "transformer model",
-  "reinforcement learning",
-  "Bayesian optimization",
-  "materials informatics",
-  "data-driven",
-  "high throughput screening",
-  "computational materials",
-  "AI-assisted",
-  "surrogate model",
-  "predictive modeling",
-  "feature engineering",
-  "regression model",
-  "classification model",
-  "unsupervised learning",
-  "supervised learning",
-  "generative model",
-  "diffusion model",
-  "large language model"
-]
-
 }
