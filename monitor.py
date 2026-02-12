@@ -1,10 +1,8 @@
 import requests
-import feedparser
 import json
 import os
 import urllib.parse
 from datetime import datetime, timedelta
-from collections import defaultdict, Counter
 
 # ================= ENV =================
 TELEGRAM_TOKEN = os.getenv("TELEGRAMTOKEN")
@@ -20,8 +18,8 @@ DAYS_BACK = 180
 DATE_THRESHOLD = datetime.utcnow() - timedelta(days=DAYS_BACK)
 FROM_DATE = DATE_THRESHOLD.strftime("%Y-%m-%d")
 
-HTTP_TIMEOUT = 15
 DISCORD_LIMIT = 1900
+HTTP_TIMEOUT = 15
 
 # ================= LOAD CONFIG =================
 with open(CONFIG_PATH, "r", encoding="utf-8") as f:
@@ -46,7 +44,6 @@ def save_json_file(path, data):
 seen = set(load_json_file(SEEN_FILE, []))
 report_data = load_json_file(REPORT_DATA_FILE, [])
 
-# ================= UTIL =================
 def normalize_key(doi=None, url=None):
     if doi:
         return doi.lower().strip()
@@ -61,19 +58,6 @@ def safe_get(url, params=None):
         return r
     except:
         return None
-
-# ================= DOMAIN + SUBDOMAIN =================
-def detect_domain_and_subdomain(title):
-    t = title.lower()
-
-    for domain_name, keywords in domains.items():
-        if domain_name == "ai_methods":
-            continue
-        for kw in keywords:
-            if kw.lower() in t:
-                return domain_name, kw
-
-    return "Other", "None"
 
 # ================= QUERY =================
 def build_query():
@@ -114,8 +98,11 @@ def check_openalex():
         if not title or not pub_date:
             continue
 
-        pub_dt = datetime.strptime(pub_date, "%Y-%m-%d")
-        if pub_dt < DATE_THRESHOLD:
+        try:
+            pub_dt = datetime.strptime(pub_date, "%Y-%m-%d")
+            if pub_dt < DATE_THRESHOLD:
+                continue
+        except:
             continue
 
         journal = "Unknown"
@@ -129,22 +116,18 @@ def check_openalex():
         if not key or key in seen:
             continue
 
-        domain, subdomain = detect_domain_and_subdomain(title)
-
         seen.add(key)
 
         results.append({
             "source": "OpenAlex",
             "title": title,
             "journal": journal,
-            "date": pub_date,
-            "domain": domain,
-            "subdomain": subdomain
+            "date": pub_date
         })
 
     return results
 
-# ================= HTML =================
+# ================= HTML DASHBOARD =================
 def generate_html(data, utc, ist):
 
     data_sorted = sorted(data, key=lambda x: x["date"], reverse=True)
@@ -156,16 +139,16 @@ def generate_html(data, utc, ist):
         if datetime.strptime(d["date"], "%Y-%m-%d") >= datetime.utcnow() - timedelta(days=30)
     )
 
-    by_source = Counter([d["source"] for d in data_sorted])
-    by_domain = Counter([d["domain"] for d in data_sorted])
-    by_subdomain = Counter([d["subdomain"] for d in data_sorted if d["subdomain"] != "None"])
+    active_sources = len(set(d["source"] for d in data_sorted))
 
     html = f"""
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>AI + Materials Intelligence</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crystal Research Intelligence</title>
+
 <style>
 body {{
     margin:0;
@@ -173,88 +156,125 @@ body {{
     background:#0f172a;
     color:#e2e8f0;
 }}
+
 .header {{
-    padding:30px;
-    background:#020617;
+    padding:25px;
+    background:linear-gradient(90deg,#020617,#0f172a);
+    text-align:center;
 }}
+
+.logo {{
+    font-size:22px;
+    font-weight:bold;
+    letter-spacing:1px;
+    color:#38bdf8;
+}}
+
+.subtitle {{
+    font-size:13px;
+    color:#94a3b8;
+    margin-top:6px;
+}}
+
 .container {{
-    padding:40px;
+    padding:20px;
+    max-width:900px;
+    margin:auto;
 }}
+
 .kpi-grid {{
     display:flex;
-    gap:20px;
-    margin-bottom:30px;
+    flex-wrap:wrap;
+    gap:15px;
+    margin-bottom:25px;
 }}
+
 .kpi {{
     flex:1;
+    min-width:150px;
     background:#1e293b;
-    padding:20px;
-    border-radius:10px;
+    padding:18px;
+    border-radius:12px;
+    text-align:center;
 }}
+
+.kpi h2 {{
+    margin:0;
+    color:#38bdf8;
+}}
+
+.search {{
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    border:none;
+    margin-bottom:20px;
+    font-size:14px;
+}}
+
 .card {{
     background:#1e293b;
     padding:18px;
-    margin-bottom:15px;
-    border-radius:10px;
+    margin-bottom:14px;
+    border-radius:12px;
+    transition:0.2s;
 }}
-.search {{
-    padding:12px;
-    width:100%;
-    margin-bottom:20px;
-    border-radius:8px;
-    border:none;
+
+.card:hover {{
+    background:#273549;
 }}
+
 .small {{
     font-size:12px;
     color:#94a3b8;
 }}
-select {{
-    padding:8px;
-    margin-bottom:15px;
+
+@media(max-width:600px){{
+    .kpi-grid {{
+        flex-direction:column;
+    }}
 }}
 </style>
 </head>
+
 <body>
 
 <div class="header">
-<h1>AI + Materials Intelligence Dashboard</h1>
-<div class="small">UTC: {utc} | IST: {ist}</div>
+<div class="logo">🔷 Crystal Research Intelligence</div>
+<div class="subtitle">
+UTC: {utc} | IST: {ist}
+</div>
 </div>
 
 <div class="container">
 
 <div class="kpi-grid">
-<div class="kpi"><h2>{total}</h2>Total Papers (180 Days)</div>
-<div class="kpi"><h2>{last_30}</h2>Last 30 Days</div>
-<div class="kpi"><h2>{len(by_source)}</h2>Active Sources</div>
+<div class="kpi">
+<h2>{total}</h2>
+<div>Total Papers (180 Days)</div>
 </div>
 
-<h3>Pattern Summary</h3>
-<div class="card">
-Top Domains:<br>
-{"<br>".join([f"{k}: {v}" for k,v in by_domain.most_common(5)])}
-<br><br>
-Top Subdomains:<br>
-{"<br>".join([f"{k}: {v}" for k,v in by_subdomain.most_common(5)])}
+<div class="kpi">
+<h2>{last_30}</h2>
+<div>Last 30 Days</div>
 </div>
 
-<input type="text" class="search" id="searchBox" placeholder="Search by title, journal, domain...">
+<div class="kpi">
+<h2>{active_sources}</h2>
+<div>Active Sources</div>
+</div>
+</div>
 
-<select id="domainFilter">
-<option value="">All Domains</option>
-{"".join([f"<option value='{d}'>{d}</option>" for d in by_domain.keys()])}
-</select>
+<input type="text" id="searchBox" class="search" placeholder="Search papers by title or journal...">
 
-<div id="papers">
+<div id="paperList">
 """
 
     for item in data_sorted:
         html += f"""
-<div class="card paper" data-domain="{item['domain']}">
+<div class="card">
 <b>{item['title']}</b><br>
 Source: {item['source']}<br>
-Domain: {item['domain']}<br>
-Sub-domain: {item['subdomain']}<br>
 Journal: {item['journal']}<br>
 <span class="small">Published: {item['date']}</span>
 </div>
@@ -265,24 +285,16 @@ Journal: {item['journal']}<br>
 
 <script>
 const searchBox = document.getElementById("searchBox");
-const domainFilter = document.getElementById("domainFilter");
 
-function filterPapers() {
-    const text = searchBox.value.toLowerCase();
-    const domain = domainFilter.value;
-    const papers = document.querySelectorAll(".paper");
+searchBox.addEventListener("keyup", function() {
+    const filter = searchBox.value.toLowerCase();
+    const cards = document.getElementsByClassName("card");
 
-    papers.forEach(p => {
-        const content = p.innerText.toLowerCase();
-        const matchesText = content.includes(text);
-        const matchesDomain = domain === "" || p.dataset.domain === domain;
-
-        p.style.display = (matchesText && matchesDomain) ? "" : "none";
-    });
-}
-
-searchBox.addEventListener("keyup", filterPapers);
-domainFilter.addEventListener("change", filterPapers);
+    for (let i = 0; i < cards.length; i++) {
+        const text = cards[i].innerText.toLowerCase();
+        cards[i].style.display = text.includes(filter) ? "" : "none";
+    }
+});
 </script>
 
 </body>
@@ -325,7 +337,7 @@ def main():
     save_json_file(REPORT_DATA_FILE, report_data)
 
     msg = f"""
-AI + Materials Intelligence
+Crystal Research Intelligence
 
 UTC: {utc.strftime('%Y-%m-%d %H:%M:%S')}
 IST: {ist.strftime('%Y-%m-%d %H:%M:%S')}
