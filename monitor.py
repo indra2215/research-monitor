@@ -4,37 +4,30 @@ import json
 import os
 import urllib.parse
 from datetime import datetime, timedelta
+from collections import defaultdict, Counter
 
 # ================= ENV =================
 TELEGRAM_TOKEN = os.getenv("TELEGRAMTOKEN")
 CHAT_ID = os.getenv("CHARTID")
 DISCORD_WEBHOOK = os.getenv("DISCORD_WEBHOOK")
-SPRINGER_API_KEY = os.getenv("SPRINGER_API_KEY")
 
 CONFIG_PATH = "config.json"
 SEEN_FILE = "seen.json"
 REPORT_DATA_FILE = "report_data.json"
-HTML_OUTPUT = "index.html"   # IMPORTANT: Pages default
+HTML_OUTPUT = "index.html"
 
 DAYS_BACK = 180
 DATE_THRESHOLD = datetime.utcnow() - timedelta(days=DAYS_BACK)
 FROM_DATE = DATE_THRESHOLD.strftime("%Y-%m-%d")
 
-DISCORD_LIMIT = 1900
 HTTP_TIMEOUT = 15
+DISCORD_LIMIT = 1900
 
 # ================= LOAD CONFIG =================
 with open(CONFIG_PATH, "r", encoding="utf-8") as f:
     config = json.load(f)
 
 domains = config["domains"]
-
-material_keywords = []
-for k, v in domains.items():
-    if k != "ai_methods":
-        material_keywords.extend(v)
-
-ai_keywords = domains.get("ai_methods", [])
 
 # ================= MEMORY =================
 def load_json_file(path, default):
@@ -53,6 +46,7 @@ def save_json_file(path, data):
 seen = set(load_json_file(SEEN_FILE, []))
 report_data = load_json_file(REPORT_DATA_FILE, [])
 
+# ================= UTIL =================
 def normalize_key(doi=None, url=None):
     if doi:
         return doi.lower().strip()
@@ -68,10 +62,30 @@ def safe_get(url, params=None):
     except:
         return None
 
+# ================= DOMAIN + SUBDOMAIN =================
+def detect_domain_and_subdomain(title):
+    t = title.lower()
+
+    for domain_name, keywords in domains.items():
+        if domain_name == "ai_methods":
+            continue
+        for kw in keywords:
+            if kw.lower() in t:
+                return domain_name, kw
+
+    return "Other", "None"
+
 # ================= QUERY =================
-def build_query(m_count=12, a_count=8):
-    m_part = "(" + " OR ".join(material_keywords[:m_count]) + ")"
-    a_part = "(" + " OR ".join(ai_keywords[:a_count]) + ")"
+def build_query():
+    material_keywords = []
+    for k, v in domains.items():
+        if k != "ai_methods":
+            material_keywords.extend(v)
+
+    ai_keywords = domains.get("ai_methods", [])
+
+    m_part = "(" + " OR ".join(material_keywords[:10]) + ")"
+    a_part = "(" + " OR ".join(ai_keywords[:6]) + ")"
     return f"{m_part} AND {a_part}"
 
 # ================= OPENALEX =================
@@ -115,28 +129,36 @@ def check_openalex():
         if not key or key in seen:
             continue
 
+        domain, subdomain = detect_domain_and_subdomain(title)
+
         seen.add(key)
 
         results.append({
             "source": "OpenAlex",
             "title": title,
             "journal": journal,
-            "date": pub_date
+            "date": pub_date,
+            "domain": domain,
+            "subdomain": subdomain
         })
 
     return results
 
-# ================= HTML DASHBOARD =================
+# ================= HTML =================
 def generate_html(data, utc, ist):
 
     data_sorted = sorted(data, key=lambda x: x["date"], reverse=True)
 
     total = len(data_sorted)
-    latest_30 = [d for d in data_sorted if d["date"] >= (datetime.utcnow() - timedelta(days=30)).strftime("%Y-%m-%d")]
 
-    by_source = {}
-    for item in data_sorted:
-        by_source[item["source"]] = by_source.get(item["source"], 0) + 1
+    last_30 = sum(
+        1 for d in data_sorted
+        if datetime.strptime(d["date"], "%Y-%m-%d") >= datetime.utcnow() - timedelta(days=30)
+    )
+
+    by_source = Counter([d["source"] for d in data_sorted])
+    by_domain = Counter([d["domain"] for d in data_sorted])
+    by_subdomain = Counter([d["subdomain"] for d in data_sorted if d["subdomain"] != "None"])
 
     html = f"""
 <!DOCTYPE html>
@@ -144,65 +166,54 @@ def generate_html(data, utc, ist):
 <head>
 <meta charset="UTF-8">
 <title>AI + Materials Intelligence</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 body {{
     margin:0;
-    font-family: 'Segoe UI', sans-serif;
-    background: #0f172a;
-    color: #e2e8f0;
+    font-family:Segoe UI;
+    background:#0f172a;
+    color:#e2e8f0;
 }}
-
 .header {{
-    padding: 30px;
-    background: #020617;
-    border-bottom: 1px solid #1e293b;
+    padding:30px;
+    background:#020617;
 }}
-
 .container {{
-    padding: 40px;
+    padding:40px;
 }}
-
 .kpi-grid {{
     display:flex;
     gap:20px;
     margin-bottom:30px;
 }}
-
 .kpi {{
     flex:1;
     background:#1e293b;
     padding:20px;
-    border-radius:12px;
+    border-radius:10px;
 }}
-
 .card {{
     background:#1e293b;
     padding:18px;
     margin-bottom:15px;
-    border-radius:12px;
-    transition:0.2s;
+    border-radius:10px;
 }}
-
-.card:hover {{
-    background:#273549;
-}}
-
-.small {{
-    font-size:12px;
-    color:#94a3b8;
-}}
-
-.search-box {{
-    padding:10px;
+.search {{
+    padding:12px;
     width:100%;
     margin-bottom:20px;
     border-radius:8px;
     border:none;
 }}
+.small {{
+    font-size:12px;
+    color:#94a3b8;
+}}
+select {{
+    padding:8px;
+    margin-bottom:15px;
+}}
 </style>
 </head>
-
 <body>
 
 <div class="header">
@@ -213,67 +224,65 @@ body {{
 <div class="container">
 
 <div class="kpi-grid">
-<div class="kpi">
-<h2>{total}</h2>
-<div>Total Papers (180 Days)</div>
+<div class="kpi"><h2>{total}</h2>Total Papers (180 Days)</div>
+<div class="kpi"><h2>{last_30}</h2>Last 30 Days</div>
+<div class="kpi"><h2>{len(by_source)}</h2>Active Sources</div>
 </div>
 
-<div class="kpi">
-<h2>{len(latest_30)}</h2>
-<div>Last 30 Days</div>
+<h3>Pattern Summary</h3>
+<div class="card">
+Top Domains:<br>
+{"<br>".join([f"{k}: {v}" for k,v in by_domain.most_common(5)])}
+<br><br>
+Top Subdomains:<br>
+{"<br>".join([f"{k}: {v}" for k,v in by_subdomain.most_common(5)])}
 </div>
 
-<div class="kpi">
-<h2>{len(by_source)}</h2>
-<div>Active Sources</div>
-</div>
-</div>
+<input type="text" class="search" id="searchBox" placeholder="Search by title, journal, domain...">
 
-<input class="search-box" type="text" id="searchInput" placeholder="Search papers..." onkeyup="filterPapers()">
+<select id="domainFilter">
+<option value="">All Domains</option>
+{"".join([f"<option value='{d}'>{d}</option>" for d in by_domain.keys()])}
+</select>
 
-<canvas id="sourceChart" height="100"></canvas>
-
-<div id="paperList">
+<div id="papers">
 """
 
     for item in data_sorted:
         html += f"""
-<div class="card">
+<div class="card paper" data-domain="{item['domain']}">
 <b>{item['title']}</b><br>
 Source: {item['source']}<br>
+Domain: {item['domain']}<br>
+Sub-domain: {item['subdomain']}<br>
 Journal: {item['journal']}<br>
 <span class="small">Published: {item['date']}</span>
 </div>
 """
 
-    html += f"""
-</div>
+    html += """
 </div>
 
 <script>
-const ctx = document.getElementById('sourceChart');
+const searchBox = document.getElementById("searchBox");
+const domainFilter = document.getElementById("domainFilter");
 
-new Chart(ctx, {{
-    type: 'bar',
-    data: {{
-        labels: {list(by_source.keys())},
-        datasets: [{{
-            label: 'Papers by Source',
-            data: {list(by_source.values())},
-        }}]
-    }}
-}});
+function filterPapers() {
+    const text = searchBox.value.toLowerCase();
+    const domain = domainFilter.value;
+    const papers = document.querySelectorAll(".paper");
 
-function filterPapers() {{
-    const input = document.getElementById("searchInput");
-    const filter = input.value.toLowerCase();
-    const cards = document.getElementsByClassName("card");
+    papers.forEach(p => {
+        const content = p.innerText.toLowerCase();
+        const matchesText = content.includes(text);
+        const matchesDomain = domain === "" || p.dataset.domain === domain;
 
-    for (let i = 0; i < cards.length; i++) {{
-        const text = cards[i].innerText.toLowerCase();
-        cards[i].style.display = text.includes(filter) ? "" : "none";
-    }}
-}}
+        p.style.display = (matchesText && matchesDomain) ? "" : "none";
+    });
+}
+
+searchBox.addEventListener("keyup", filterPapers);
+domainFilter.addEventListener("change", filterPapers);
 </script>
 
 </body>
@@ -306,8 +315,7 @@ def main():
 
     new_results = check_openalex()
 
-    # Deduplicate report_data
-    existing_keys = {(item["title"], item["date"]) for item in report_data}
+    existing_keys = {(d["title"], d["date"]) for d in report_data}
 
     for item in new_results:
         if (item["title"], item["date"]) not in existing_keys:
@@ -329,9 +337,11 @@ Total Stored: {len(report_data)}
     send_telegram(msg)
     send_discord(msg)
 
-    generate_html(report_data,
-                  utc.strftime('%Y-%m-%d %H:%M:%S'),
-                  ist.strftime('%Y-%m-%d %H:%M:%S'))
+    generate_html(
+        report_data,
+        utc.strftime('%Y-%m-%d %H:%M:%S'),
+        ist.strftime('%Y-%m-%d %H:%M:%S')
+    )
 
 if __name__ == "__main__":
     main()
