@@ -107,4 +107,29 @@
       "state-of-health"
     ]
   }
+  "ai_methods": [
+  "machine learning",
+  "deep learning",
+  "neural network",
+  "graph neural network",
+  "transformer model",
+  "reinforcement learning",
+  "Bayesian optimization",
+  "materials informatics",
+  "data-driven",
+  "high throughput screening",
+  "computational materials",
+  "AI-assisted",
+  "surrogate model",
+  "predictive modeling",
+  "feature engineering",
+  "regression model",
+  "classification model",
+  "unsupervised learning",
+  "supervised learning",
+  "generative model",
+  "diffusion model",
+  "large language model"
+]
+
 }
