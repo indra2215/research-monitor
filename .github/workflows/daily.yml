@@ -31,6 +31,7 @@ jobs:
           TELEGRAMTOKEN: ${{ secrets.TELEGRAMTOKEN }}
           CHARTID: ${{ secrets.CHARTID }}
           S2_API_KEY: ${{ secrets.S2_API_KEY }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: python monitor.py
 
       - name: Commit updated seen.json
