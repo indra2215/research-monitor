@@ -18,9 +18,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Pull latest
-        run: git pull origin main
-
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -51,4 +48,4 @@ jobs:
 
           git add seen.json report_data.json index.html || true
           git commit -m "Auto update research dashboard" || echo "No changes"
-          git push origin main
+          git push
