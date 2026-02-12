@@ -33,10 +33,17 @@ for k, v in domains.items():
 
 ai_keywords = domains.get("ai_methods", [])
 
+# Remove duplicates
+material_keywords = list(set(material_keywords))
+ai_keywords = list(set(ai_keywords))
+
 # ================= MEMORY =================
 if os.path.exists(SEEN_FILE):
-    with open(SEEN_FILE, "r", encoding="utf-8") as f:
-        seen = set(json.load(f))
+    try:
+        with open(SEEN_FILE, "r", encoding="utf-8") as f:
+            seen = set(json.load(f))
+    except:
+        seen = set()
 else:
     seen = set()
 
@@ -83,7 +90,9 @@ def check_springer():
     if not r:
         return []
 
-    for rec in r.json().get("records", []):
+    data = r.json()
+
+    for rec in data.get("records", []):
         doi = rec.get("doi")
         title = rec.get("title")
         journal = rec.get("publicationName")
@@ -101,15 +110,17 @@ def check_springer():
 def check_openalex():
     results = []
     query = build_and_query(material_keywords, ai_keywords)
-
     encoded = urllib.parse.quote(query)
+
     url = f"https://api.openalex.org/works?search={encoded}&per-page=50"
 
     r = safe_get(url)
     if not r:
         return []
 
-    for w in r.json().get("results", []):
+    data = r.json()
+
+    for w in data.get("results", []):
         doi = w.get("doi")
         title = w.get("title")
         journal = (w.get("primary_location") or {}).get("source", {}).get("display_name")
@@ -127,15 +138,17 @@ def check_openalex():
 def check_crossref():
     results = []
     query = build_and_query(material_keywords, ai_keywords)
-
     encoded = urllib.parse.quote(query)
+
     url = f"https://api.crossref.org/works?query={encoded}&rows=50"
 
     r = safe_get(url)
     if not r:
         return []
 
-    for item in r.json().get("message", {}).get("items", []):
+    data = r.json()
+
+    for item in data.get("message", {}).get("items", []):
         doi = item.get("DOI")
         title = (item.get("title") or [""])[0]
         journal = (item.get("container-title") or [""])[0]
@@ -173,24 +186,45 @@ def check_arxiv():
         if key in seen:
             continue
 
+        category = entry.tags[0]["term"] if hasattr(entry, "tags") and entry.tags else "N/A"
+
         seen.add(key)
-        results.append(f"[arXiv] {entry.title}\nCategory: {entry.tags[0]['term'] if entry.tags else 'N/A'}\n")
+        results.append(f"[arXiv] {entry.title}\nCategory: {category}\n")
 
     return results
 
 # ================= TELEGRAM =================
 def send_telegram(msg):
     if not TELEGRAM_TOKEN or not CHAT_ID:
+        print("Telegram credentials missing.")
         return
 
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-    requests.post(url, json={"chat_id": CHAT_ID, "text": msg})
+
+    chunks = [msg[i:i+3500] for i in range(0, len(msg), 3500)]
+
+    for chunk in chunks:
+        try:
+            r = requests.post(url, json={"chat_id": CHAT_ID, "text": chunk})
+            print("Telegram status:", r.status_code)
+        except Exception as e:
+            print("Telegram error:", e)
 
 # ================= DISCORD =================
 def send_discord(msg):
     if not DISCORD_WEBHOOK:
+        print("Discord webhook missing.")
         return
-    requests.post(DISCORD_WEBHOOK, json={"content": msg})
+
+    MAX_DISCORD = 1900
+    chunks = [msg[i:i+MAX_DISCORD] for i in range(0, len(msg), MAX_DISCORD)]
+
+    for chunk in chunks:
+        try:
+            r = requests.post(DISCORD_WEBHOOK, json={"content": chunk})
+            print("Discord status:", r.status_code)
+        except Exception as e:
+            print("Discord error:", e)
 
 # ================= MAIN =================
 def main():
