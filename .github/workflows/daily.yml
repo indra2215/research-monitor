@@ -2,8 +2,13 @@ name: Daily Research Monitor
 
 on:
   schedule:
-    - cron: '30 4 * * *'
+    - cron: '30 4 * * *'   # 10:00 AM IST
   workflow_dispatch:
+
+permissions:
+  contents: write   # REQUIRED for git push
+  pages: write
+  id-token: write
 
 jobs:
   run-monitor:
@@ -14,9 +19,10 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -41,11 +47,16 @@ jobs:
           SPRINGER_API_KEY: ${{ secrets.SPRINGER_API_KEY }}
         run: python monitor.py
 
-      - name: Commit Updates
+      - name: Commit and Push Updates
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
 
-          git add seen.json report_data.json index.html || true
-          git commit -m "Auto update research dashboard" || echo "No changes"
-          git push
+          git add seen.json report_data.json index.html
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Auto update research dashboard"
+            git push origin main
+          fi
