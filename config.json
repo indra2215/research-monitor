@@ -117,6 +117,25 @@
       "physics-informed neural network",
       "AI for materials",
       "ML for materials"
-    ]
+    ],
+    "data_storage_materials": [
+  "data storage material",
+  "optical storage material",
+  "glass data storage",
+  "quartz storage",
+  "silica storage",
+  "5D optical storage",
+  "nanostructured glass",
+  "photonic storage",
+  "holographic storage",
+  "phase change memory",
+  "PCM memory",
+  "spintronic memory",
+  "magnetic storage material",
+  "non volatile memory material",
+  "memory material",
+  "information storage material",
+  "advanced storage material"
+]
   }
 }
