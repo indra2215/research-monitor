@@ -2,12 +2,15 @@ import requests
 import json
 import os
 import urllib.parse
+import feedparser
 from datetime import datetime, timedelta
 
 # ================= ENV =================
+
 TELEGRAM_TOKEN = os.getenv("TELEGRAMTOKEN")
 CHAT_ID = os.getenv("CHARTID")
 DISCORD_WEBHOOK = os.getenv("DISCORD_WEBHOOK")
+SPRINGER_API_KEY = os.getenv("SPRINGER_API_KEY")
 
 CONFIG_PATH = "config.json"
 SEEN_FILE = "seen.json"
@@ -18,31 +21,42 @@ DAYS_BACK = 180
 DATE_THRESHOLD = datetime.utcnow() - timedelta(days=DAYS_BACK)
 FROM_DATE = DATE_THRESHOLD.strftime("%Y-%m-%d")
 
+HTTP_TIMEOUT = 20
 DISCORD_LIMIT = 1900
-HTTP_TIMEOUT = 15
 
 # ================= LOAD CONFIG =================
-with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+
+with open(CONFIG_PATH, "r") as f:
     config = json.load(f)
 
 domains = config["domains"]
 
-# ================= MEMORY =================
-def load_json_file(path, default):
+material_keywords = []
+for k, v in domains.items():
+    if k != "ai_methods":
+        material_keywords.extend(v)
+
+ai_keywords = domains.get("ai_methods", [])
+
+# ================= STORAGE =================
+
+def load_json(path):
     if os.path.exists(path):
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, "r") as f:
                 return json.load(f)
         except:
-            return default
-    return default
+            return []
+    return []
 
-def save_json_file(path, data):
-    with open(path, "w", encoding="utf-8") as f:
+def save_json(path, data):
+    with open(path, "w") as f:
         json.dump(data, f, indent=2)
 
-seen = set(load_json_file(SEEN_FILE, []))
-report_data = load_json_file(REPORT_DATA_FILE, [])
+seen = set(load_json(SEEN_FILE))
+report_data = load_json(REPORT_DATA_FILE)
+
+# ================= UTIL =================
 
 def normalize_key(doi=None, url=None):
     if doi:
@@ -59,60 +73,54 @@ def safe_get(url, params=None):
     except:
         return None
 
-# ================= QUERY =================
 def build_query():
-    material_keywords = []
-    for k, v in domains.items():
-        if k != "ai_methods":
-            material_keywords.extend(v)
 
-    ai_keywords = domains.get("ai_methods", [])
+    m = "(" + " OR ".join(material_keywords[:10]) + ")"
+    a = "(" + " OR ".join(ai_keywords[:8]) + ")"
 
-    m_part = "(" + " OR ".join(material_keywords[:10]) + ")"
-    a_part = "(" + " OR ".join(ai_keywords[:6]) + ")"
-    return f"{m_part} AND {a_part}"
+    return f"{m} AND {a}"
 
 # ================= OPENALEX =================
-def check_openalex():
+
+def fetch_openalex():
+
     results = []
 
-    query = build_query()
-    encoded = urllib.parse.quote(query)
+    query = urllib.parse.quote(build_query())
 
     url = (
         f"https://api.openalex.org/works?"
-        f"search={encoded}"
+        f"search={query}"
         f"&filter=from_publication_date:{FROM_DATE}"
         f"&per-page=50"
     )
 
     r = safe_get(url)
+
     if not r:
         return results
 
-    for w in r.json().get("results", []):
-        doi = w.get("doi")
-        title = w.get("title")
-        pub_date = w.get("publication_date")
+    for w in r.json()["results"]:
 
-        if not title or not pub_date:
+        title = w.get("title")
+        date = w.get("publication_date")
+        doi = w.get("doi")
+
+        if not title or not date:
             continue
 
-        try:
-            pub_dt = datetime.strptime(pub_date, "%Y-%m-%d")
-            if pub_dt < DATE_THRESHOLD:
-                continue
-        except:
+        if datetime.strptime(date, "%Y-%m-%d") < DATE_THRESHOLD:
             continue
 
         journal = "Unknown"
-        primary = w.get("primary_location")
-        if isinstance(primary, dict):
-            source = primary.get("source")
-            if isinstance(source, dict):
-                journal = source.get("display_name", "Unknown")
 
-        key = normalize_key(doi=doi)
+        primary = w.get("primary_location")
+
+        if primary and primary.get("source"):
+            journal = primary["source"].get("display_name", "Unknown")
+
+        key = normalize_key(doi)
+
         if not key or key in seen:
             continue
 
@@ -122,237 +130,277 @@ def check_openalex():
             "source": "OpenAlex",
             "title": title,
             "journal": journal,
-            "date": pub_date
+            "date": date
         })
 
     return results
 
-# ================= HTML DASHBOARD =================
+# ================= SPRINGER (Nature, Scientific Reports etc) =================
+
+def fetch_springer():
+
+    if not SPRINGER_API_KEY:
+        return []
+
+    results = []
+
+    query = build_query()
+
+    params = {
+        "q": query,
+        "api_key": SPRINGER_API_KEY,
+        "p": 50
+    }
+
+    r = safe_get(
+        "https://api.springernature.com/meta/v2/json",
+        params=params
+    )
+
+    if not r:
+        return results
+
+    for rec in r.json().get("records", []):
+
+        title = rec.get("title")
+        date = rec.get("publicationDate")
+        doi = rec.get("doi")
+        journal = rec.get("publicationName", "Springer")
+
+        if not title or not date:
+            continue
+
+        try:
+            if datetime.strptime(date[:10], "%Y-%m-%d") < DATE_THRESHOLD:
+                continue
+        except:
+            continue
+
+        key = normalize_key(doi)
+
+        if not key or key in seen:
+            continue
+
+        seen.add(key)
+
+        results.append({
+            "source": "Springer Nature",
+            "title": title,
+            "journal": journal,
+            "date": date[:10]
+        })
+
+    return results
+
+# ================= CROSSREF =================
+
+def fetch_crossref():
+
+    results = []
+
+    query = urllib.parse.quote(build_query())
+
+    url = f"https://api.crossref.org/works?query={query}&rows=50"
+
+    r = safe_get(url)
+
+    if not r:
+        return results
+
+    for item in r.json()["message"]["items"]:
+
+        title = item.get("title", [""])[0]
+        doi = item.get("DOI")
+        journal = item.get("container-title", ["Unknown"])[0]
+
+        date_parts = item.get("issued", {}).get("date-parts", [[None]])
+
+        if not date_parts[0][0]:
+            continue
+
+        year = date_parts[0][0]
+        month = date_parts[0][1] if len(date_parts[0]) > 1 else 1
+        day = date_parts[0][2] if len(date_parts[0]) > 2 else 1
+
+        date = f"{year:04}-{month:02}-{day:02}"
+
+        if datetime.strptime(date, "%Y-%m-%d") < DATE_THRESHOLD:
+            continue
+
+        key = normalize_key(doi)
+
+        if not key or key in seen:
+            continue
+
+        seen.add(key)
+
+        results.append({
+            "source": "Crossref",
+            "title": title,
+            "journal": journal,
+            "date": date
+        })
+
+    return results
+
+# ================= ARXIV =================
+
+def fetch_arxiv():
+
+    results = []
+
+    query = urllib.parse.quote(build_query())
+
+    url = f"http://export.arxiv.org/api/query?search_query=all:{query}&max_results=50"
+
+    r = safe_get(url)
+
+    if not r:
+        return results
+
+    feed = feedparser.parse(r.content)
+
+    for entry in feed.entries:
+
+        title = entry.title
+        date = entry.published[:10]
+
+        if datetime.strptime(date, "%Y-%m-%d") < DATE_THRESHOLD:
+            continue
+
+        key = normalize_key(url=entry.id)
+
+        if key in seen:
+            continue
+
+        seen.add(key)
+
+        results.append({
+            "source": "arXiv",
+            "title": title,
+            "journal": "arXiv",
+            "date": date
+        })
+
+    return results
+
+# ================= HTML =================
+
 def generate_html(data, utc, ist):
 
     data_sorted = sorted(data, key=lambda x: x["date"], reverse=True)
 
     total = len(data_sorted)
 
-    last_30 = sum(
+    last30 = sum(
         1 for d in data_sorted
         if datetime.strptime(d["date"], "%Y-%m-%d") >= datetime.utcnow() - timedelta(days=30)
     )
 
-    active_sources = len(set(d["source"] for d in data_sorted))
+    sources = len(set(d["source"] for d in data_sorted))
+
+    cards = ""
+
+    for d in data_sorted:
+
+        cards += f"""
+<div class="card">
+<b>{d['title']}</b><br>
+Source: {d['source']}<br>
+Journal: {d['journal']}<br>
+<span class="small">{d['date']}</span>
+</div>
+"""
 
     html = f"""
-<!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Crystal Research Intelligence</title>
-
 <style>
 body {{
-    margin:0;
-    font-family:Segoe UI;
-    background:#0f172a;
-    color:#e2e8f0;
-}}
-
-.header {{
-    padding:25px;
-    background:linear-gradient(90deg,#020617,#0f172a);
-    text-align:center;
-}}
-
-.logo {{
-    font-size:22px;
-    font-weight:bold;
-    letter-spacing:1px;
-    color:#38bdf8;
-}}
-
-.subtitle {{
-    font-size:13px;
-    color:#94a3b8;
-    margin-top:6px;
-}}
-
-.container {{
-    padding:20px;
-    max-width:900px;
-    margin:auto;
-}}
-
-.kpi-grid {{
-    display:flex;
-    flex-wrap:wrap;
-    gap:15px;
-    margin-bottom:25px;
-}}
-
-.kpi {{
-    flex:1;
-    min-width:150px;
-    background:#1e293b;
-    padding:18px;
-    border-radius:12px;
-    text-align:center;
-}}
-
-.kpi h2 {{
-    margin:0;
-    color:#38bdf8;
-}}
-
-.search {{
-    width:100%;
-    padding:12px;
-    border-radius:10px;
-    border:none;
-    margin-bottom:20px;
-    font-size:14px;
+background:#0f172a;
+color:white;
+font-family:Arial;
+padding:20px;
 }}
 
 .card {{
-    background:#1e293b;
-    padding:18px;
-    margin-bottom:14px;
-    border-radius:12px;
-    transition:0.2s;
+background:#1e293b;
+padding:15px;
+margin:10px 0;
+border-radius:8px;
 }}
 
-.card:hover {{
-    background:#273549;
-}}
-
-.small {{
-    font-size:12px;
-    color:#94a3b8;
-}}
-
-@media(max-width:600px){{
-    .kpi-grid {{
-        flex-direction:column;
-    }}
+.search {{
+padding:10px;
+width:100%;
+margin-bottom:15px;
 }}
 </style>
 </head>
-
 <body>
 
-<div class="header">
-<div class="logo">🔷 Crystal Research Intelligence</div>
-<div class="subtitle">
-UTC: {utc} | IST: {ist}
-</div>
-</div>
+<h2>Crystal Research Intelligence</h2>
 
-<div class="container">
+Total Papers: {total}<br>
+Last 30 Days: {last30}<br>
+Sources: {sources}<br><br>
 
-<div class="kpi-grid">
-<div class="kpi">
-<h2>{total}</h2>
-<div>Total Papers (180 Days)</div>
-</div>
+<input class="search" id="search" placeholder="Search">
 
-<div class="kpi">
-<h2>{last_30}</h2>
-<div>Last 30 Days</div>
-</div>
-
-<div class="kpi">
-<h2>{active_sources}</h2>
-<div>Active Sources</div>
-</div>
-</div>
-
-<input type="text" id="searchBox" class="search" placeholder="Search papers by title or journal...">
-
-<div id="paperList">
-"""
-
-    for item in data_sorted:
-        html += f"""
-<div class="card">
-<b>{item['title']}</b><br>
-Source: {item['source']}<br>
-Journal: {item['journal']}<br>
-<span class="small">Published: {item['date']}</span>
-</div>
-"""
-
-    html += """
+<div id="list">
+{cards}
 </div>
 
 <script>
-const searchBox = document.getElementById("searchBox");
 
-searchBox.addEventListener("keyup", function() {
-    const filter = searchBox.value.toLowerCase();
-    const cards = document.getElementsByClassName("card");
+document.getElementById("search").onkeyup = function() {{
 
-    for (let i = 0; i < cards.length; i++) {
-        const text = cards[i].innerText.toLowerCase();
-        cards[i].style.display = text.includes(filter) ? "" : "none";
-    }
-});
+let v = this.value.toLowerCase()
+
+document.querySelectorAll(".card").forEach(c=>{{
+c.style.display = c.innerText.toLowerCase().includes(v) ? "" : "none"
+}})
+
+}}
+
 </script>
 
 </body>
 </html>
 """
 
-    with open(HTML_OUTPUT, "w", encoding="utf-8") as f:
+    with open(HTML_OUTPUT, "w") as f:
         f.write(html)
 
-# ================= TELEGRAM =================
-def send_telegram(msg):
-    if not TELEGRAM_TOKEN or not CHAT_ID:
-        return
-    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-    requests.post(url, json={"chat_id": CHAT_ID, "text": msg})
-
-# ================= DISCORD =================
-def send_discord(msg):
-    if not DISCORD_WEBHOOK:
-        return
-    chunks = [msg[i:i+DISCORD_LIMIT] for i in range(0, len(msg), DISCORD_LIMIT)]
-    for chunk in chunks:
-        requests.post(DISCORD_WEBHOOK, json={"content": chunk})
-
 # ================= MAIN =================
+
 def main():
 
     utc = datetime.utcnow()
     ist = utc + timedelta(hours=5, minutes=30)
 
-    new_results = check_openalex()
+    new = []
 
-    existing_keys = {(d["title"], d["date"]) for d in report_data}
+    new += fetch_openalex()
+    new += fetch_springer()
+    new += fetch_crossref()
+    new += fetch_arxiv()
 
-    for item in new_results:
-        if (item["title"], item["date"]) not in existing_keys:
-            report_data.append(item)
+    existing = {(d["title"], d["date"]) for d in report_data}
 
-    save_json_file(SEEN_FILE, list(seen))
-    save_json_file(REPORT_DATA_FILE, report_data)
+    for n in new:
+        if (n["title"], n["date"]) not in existing:
+            report_data.append(n)
 
-    msg = f"""
-Crystal Research Intelligence
-
-UTC: {utc.strftime('%Y-%m-%d %H:%M:%S')}
-IST: {ist.strftime('%Y-%m-%d %H:%M:%S')}
-
-New Findings: {len(new_results)}
-Total Stored: {len(report_data)}
-"""
-
-    send_telegram(msg)
-    send_discord(msg)
+    save_json(SEEN_FILE, list(seen))
+    save_json(REPORT_DATA_FILE, report_data)
 
     generate_html(
         report_data,
-        utc.strftime('%Y-%m-%d %H:%M:%S'),
-        ist.strftime('%Y-%m-%d %H:%M:%S')
+        utc.strftime("%Y-%m-%d %H:%M"),
+        ist.strftime("%Y-%m-%d %H:%M")
     )
 
 if __name__ == "__main__":
