@@ -75,8 +75,8 @@ def safe_get(url, params=None):
 
 def build_query():
 
-    m = "(" + " OR ".join(material_keywords[:10]) + ")"
-    a = "(" + " OR ".join(ai_keywords[:8]) + ")"
+    m = "(" + " OR ".join(material_keywords[:15]) + ")"
+    a = "(" + " OR ".join(ai_keywords[:10]) + ")"
 
     return f"{m} AND {a}"
 
@@ -100,7 +100,7 @@ def fetch_openalex():
     if not r:
         return results
 
-    for w in r.json()["results"]:
+    for w in r.json().get("results", []):
 
         title = w.get("title")
         date = w.get("publication_date")
@@ -109,15 +109,17 @@ def fetch_openalex():
         if not title or not date:
             continue
 
-        if datetime.strptime(date, "%Y-%m-%d") < DATE_THRESHOLD:
+        try:
+            if datetime.strptime(date, "%Y-%m-%d") < DATE_THRESHOLD:
+                continue
+        except:
             continue
 
-        journal = "Unknown"
+        journal = "OpenAlex"
 
         primary = w.get("primary_location")
-
         if primary and primary.get("source"):
-            journal = primary["source"].get("display_name", "Unknown")
+            journal = primary["source"].get("display_name", journal)
 
         key = normalize_key(doi)
 
@@ -135,7 +137,7 @@ def fetch_openalex():
 
     return results
 
-# ================= SPRINGER (Nature, Scientific Reports etc) =================
+# ================= SPRINGER =================
 
 def fetch_springer():
 
@@ -144,18 +146,13 @@ def fetch_springer():
 
     results = []
 
-    query = build_query()
-
     params = {
-        "q": query,
+        "q": build_query(),
         "api_key": SPRINGER_API_KEY,
         "p": 50
     }
 
-    r = safe_get(
-        "https://api.springernature.com/meta/v2/json",
-        params=params
-    )
+    r = safe_get("https://api.springernature.com/meta/v2/json", params)
 
     if not r:
         return results
@@ -170,8 +167,10 @@ def fetch_springer():
         if not title or not date:
             continue
 
+        date = date[:10]
+
         try:
-            if datetime.strptime(date[:10], "%Y-%m-%d") < DATE_THRESHOLD:
+            if datetime.strptime(date, "%Y-%m-%d") < DATE_THRESHOLD:
                 continue
         except:
             continue
@@ -187,7 +186,7 @@ def fetch_springer():
             "source": "Springer Nature",
             "title": title,
             "journal": journal,
-            "date": date[:10]
+            "date": date
         })
 
     return results
@@ -198,9 +197,7 @@ def fetch_crossref():
 
     results = []
 
-    query = urllib.parse.quote(build_query())
-
-    url = f"https://api.crossref.org/works?query={query}&rows=50"
+    url = f"https://api.crossref.org/works?query={urllib.parse.quote(build_query())}&rows=50"
 
     r = safe_get(url)
 
@@ -211,16 +208,16 @@ def fetch_crossref():
 
         title = item.get("title", [""])[0]
         doi = item.get("DOI")
-        journal = item.get("container-title", ["Unknown"])[0]
+        journal = item.get("container-title", ["Crossref"])[0]
 
-        date_parts = item.get("issued", {}).get("date-parts", [[None]])
+        parts = item.get("issued", {}).get("date-parts", [[None]])
 
-        if not date_parts[0][0]:
+        if not parts[0][0]:
             continue
 
-        year = date_parts[0][0]
-        month = date_parts[0][1] if len(date_parts[0]) > 1 else 1
-        day = date_parts[0][2] if len(date_parts[0]) > 2 else 1
+        year = parts[0][0]
+        month = parts[0][1] if len(parts[0]) > 1 else 1
+        day = parts[0][2] if len(parts[0]) > 2 else 1
 
         date = f"{year:04}-{month:02}-{day:02}"
 
@@ -249,9 +246,7 @@ def fetch_arxiv():
 
     results = []
 
-    query = urllib.parse.quote(build_query())
-
-    url = f"http://export.arxiv.org/api/query?search_query=all:{query}&max_results=50"
+    url = f"http://export.arxiv.org/api/query?search_query=all:{urllib.parse.quote(build_query())}&max_results=50"
 
     r = safe_get(url)
 
@@ -284,20 +279,56 @@ def fetch_arxiv():
 
     return results
 
+# ================= NATURE RSS (CRITICAL FIX) =================
+
+def fetch_nature():
+
+    feeds = [
+        "https://www.nature.com/nature.rss",
+        "https://www.nature.com/subjects/materials-science.rss",
+        "https://www.nature.com/subjects/artificial-intelligence.rss",
+        "https://www.nature.com/subjects/data-storage.rss"
+    ]
+
+    results = []
+
+    for url in feeds:
+
+        feed = feedparser.parse(url)
+
+        for entry in feed.entries:
+
+            title = entry.title
+            link = entry.link
+
+            try:
+                date = entry.published[:10]
+                if datetime.strptime(date, "%Y-%m-%d") < DATE_THRESHOLD:
+                    continue
+            except:
+                continue
+
+            key = normalize_key(url=link)
+
+            if key in seen:
+                continue
+
+            seen.add(key)
+
+            results.append({
+                "source": "Nature",
+                "title": title,
+                "journal": "Nature",
+                "date": date
+            })
+
+    return results
+
 # ================= HTML =================
 
 def generate_html(data, utc, ist):
 
     data_sorted = sorted(data, key=lambda x: x["date"], reverse=True)
-
-    total = len(data_sorted)
-
-    last30 = sum(
-        1 for d in data_sorted
-        if datetime.strptime(d["date"], "%Y-%m-%d") >= datetime.utcnow() - timedelta(days=30)
-    )
-
-    sources = len(set(d["source"] for d in data_sorted))
 
     cards = ""
 
@@ -308,15 +339,14 @@ def generate_html(data, utc, ist):
 <b>{d['title']}</b><br>
 Source: {d['source']}<br>
 Journal: {d['journal']}<br>
-<span class="small">{d['date']}</span>
+Date: {d['date']}
 </div>
 """
 
     html = f"""
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Crystal Research Intelligence</title>
+<meta name="viewport" content="width=device-width">
 <style>
 body {{
 background:#0f172a;
@@ -324,18 +354,11 @@ color:white;
 font-family:Arial;
 padding:20px;
 }}
-
 .card {{
 background:#1e293b;
 padding:15px;
 margin:10px 0;
 border-radius:8px;
-}}
-
-.search {{
-padding:10px;
-width:100%;
-margin-bottom:15px;
 }}
 </style>
 </head>
@@ -343,29 +366,11 @@ margin-bottom:15px;
 
 <h2>Crystal Research Intelligence</h2>
 
-Total Papers: {total}<br>
-Last 30 Days: {last30}<br>
-Sources: {sources}<br><br>
+UTC: {utc}<br>
+IST: {ist}<br>
+Total Papers: {len(data_sorted)}<br>
 
-<input class="search" id="search" placeholder="Search">
-
-<div id="list">
 {cards}
-</div>
-
-<script>
-
-document.getElementById("search").onkeyup = function() {{
-
-let v = this.value.toLowerCase()
-
-document.querySelectorAll(".card").forEach(c=>{{
-c.style.display = c.innerText.toLowerCase().includes(v) ? "" : "none"
-}})
-
-}}
-
-</script>
 
 </body>
 </html>
@@ -387,6 +392,7 @@ def main():
     new += fetch_springer()
     new += fetch_crossref()
     new += fetch_arxiv()
+    new += fetch_nature()   # critical fix
 
     existing = {(d["title"], d["date"]) for d in report_data}
 
