@@ -2,65 +2,49 @@ name: Crystal Research Monitor + Deploy
 
 on:
   schedule:
-    - cron: '30 4 * * *'
-  workflow_dispatch:
-
-permissions:
-  contents: write
-  pages: write
-  id-token: write
+    - cron: '0 0 * * *' # Runs daily at midnight UTC
+  workflow_dispatch: # Allows manual trigger
 
 jobs:
-
   build-and-deploy:
-
     runs-on: ubuntu-latest
-
     steps:
-
-      - name: Checkout repo
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.10'
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: |
           pip install requests feedparser
 
-      - name: Ensure files exist
-        run: |
-          if [ ! -f seen.json ]; then echo "[]" > seen.json; fi
-          if [ ! -f report_data.json ]; then echo "[]" > report_data.json; fi
-
-      - name: Run monitor
+      - name: Run Monitor Script
         env:
+          # Mapping your GitHub Secrets to Environment Variables
           TELEGRAMTOKEN: ${{ secrets.TELEGRAMTOKEN }}
           CHARTID: ${{ secrets.CHARTID }}
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
           SPRINGER_API_KEY: ${{ secrets.SPRINGER_API_KEY }}
         run: python monitor.py
 
-      - name: Commit changes
+      - name: Commit and Push Changes
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-
-          git add index.html seen.json report_data.json
-
-          git commit -m "Auto update research dashboard" || echo "No changes"
-
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add seen.json report_data.json index.html
+          git commit -m "Update research data [skip ci]" || echo "No changes to commit"
           git push
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
+      - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: '.'
 
-      - name: Deploy Pages
+      - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
+        permissions:
+          pages: write
+          id-token: write
