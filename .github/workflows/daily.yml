@@ -2,11 +2,16 @@ name: Crystal Research Monitor + Deploy
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Runs daily at midnight UTC
-  workflow_dispatch: # Allows manual trigger
+    - cron: '30 5 * * *' # Runs daily at 11:00 AM IST (5:30 UTC)
+  workflow_dispatch: 
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
-  build-and-deploy:
+  run-monitor:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -23,7 +28,6 @@ jobs:
 
       - name: Run Monitor Script
         env:
-          # Mapping your GitHub Secrets to Environment Variables
           TELEGRAMTOKEN: ${{ secrets.TELEGRAMTOKEN }}
           CHARTID: ${{ secrets.CHARTID }}
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
@@ -44,7 +48,5 @@ jobs:
           path: '.'
 
       - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
-        permissions:
-          pages: write
-          id-token: write
