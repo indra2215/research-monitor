@@ -378,6 +378,13 @@ New papers: {added}
 Total papers: {len(report_data)}
 Time: {ist.strftime("%Y-%m-%d %H:%M IST")}"""
 
+    # DEBUG: Verify secrets are loaded before attempting to send
+    print("=== SECRET CHECK ===")
+    print("TG token set:", bool(TELEGRAM_TOKEN))
+    print("Chat ID set:", bool(CHAT_ID))
+    print("Discord set:", bool(DISCORD_WEBHOOK))
+    print("====================")
+
     send_telegram(msg)
     send_discord(msg)
     print("Sync complete. New:", added, "| Total:", len(report_data))
