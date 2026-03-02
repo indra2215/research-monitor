@@ -26,29 +26,43 @@ DISCORD_LIMIT = 1900
 
 # ================= STORAGE =================
 
-def load_json(path):
+def load_json(path, default=None):
+    """
+    BUG FIX #1: Added 'default' param.
+    config.json is a dict, seen.json/report_data.json are lists.
+    Returning wrong type caused TypeError: list indices must be integers.
+    """
+    if default is None:
+        default = []
     if os.path.exists(path):
         try:
             with open(path, "r") as f:
                 return json.load(f)
-        except:
-            return []
-    return []
+        except Exception as e:
+            print(f"Failed to load {path}: {e}")
+            return default
+    return default
 
 def save_json(path, data):
     with open(path, "w") as f:
         json.dump(data, f, indent=2)
 
-seen = set(load_json(SEEN_FILE))
-report_data = load_json(REPORT_DATA_FILE)
+seen_list = load_json(SEEN_FILE, default=[])
+seen = set(seen_list)
+report_data = load_json(REPORT_DATA_FILE, default=[])
 
 # ================= UTIL =================
 
-def normalize_key(doi=None, url=None):
+def normalize_key(doi=None, url=None, title=None):
+    """
+    BUG FIX #7: Added title fallback so papers without DOI/URL aren't silently dropped.
+    """
     if doi:
-        return doi.lower()
+        return doi.strip().lower()
     if url:
-        return url.lower()
+        return url.strip().lower()
+    if title:
+        return title.strip().lower()
     return None
 
 def safe_get(url, params=None):
@@ -60,63 +74,100 @@ def safe_get(url, params=None):
         print("HTTP ERROR:", e)
         return None
 
+def is_recent(date_str):
+    """
+    BUG FIX #2: DATE_THRESHOLD was defined but never applied anywhere.
+    Now used in both fetchers to filter old papers.
+    """
+    try:
+        dt = datetime.strptime(date_str, "%Y-%m-%d")
+        return dt >= DATE_THRESHOLD
+    except Exception:
+        return True  # If we can't parse date, don't discard
+
 # ================= TELEGRAM =================
 
 def send_telegram(msg):
-
+    """
+    BUG FIX #4: Chunking at raw char boundaries splits HTML tags,
+    causing Telegram to reject with 400 parse error.
+    Strip HTML tags for chunked sends, or send plain text.
+    Safe approach: use plain text (no parse_mode) for chunked messages.
+    """
     if not TELEGRAM_TOKEN or not CHAT_ID:
         print("Telegram secrets missing")
         return
 
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
 
-    for i in range(0, len(msg), TELEGRAM_LIMIT):
+    chunks = []
+    current = ""
+    for line in msg.split("\n"):
+        if len(current) + len(line) + 1 > TELEGRAM_LIMIT:
+            chunks.append(current)
+            current = line
+        else:
+            current += ("\n" if current else "") + line
+    if current:
+        chunks.append(current)
 
-        chunk = msg[i:i+TELEGRAM_LIMIT]
-
+    for chunk in chunks:
         try:
-            r = requests.post(url,
+            r = requests.post(
+                url,
                 json={
                     "chat_id": CHAT_ID,
                     "text": chunk,
                     "parse_mode": "HTML"
                 },
-                timeout=HTTP_TIMEOUT)
-
-            print("Telegram status:", r.status_code)
-
+                timeout=HTTP_TIMEOUT
+            )
+            if r.status_code != 200:
+                # Fallback: retry without parse_mode if HTML parse fails
+                r2 = requests.post(
+                    url,
+                    json={
+                        "chat_id": CHAT_ID,
+                        "text": chunk
+                    },
+                    timeout=HTTP_TIMEOUT
+                )
+                print("Telegram fallback status:", r2.status_code)
+            else:
+                print("Telegram status:", r.status_code)
         except Exception as e:
             print("Telegram send error:", e)
 
 # ================= DISCORD =================
 
 def send_discord(msg):
-
     if not DISCORD_WEBHOOK:
         print("Discord webhook missing")
         return
 
     for i in range(0, len(msg), DISCORD_LIMIT):
-
-        chunk = msg[i:i+DISCORD_LIMIT]
-
+        chunk = msg[i:i + DISCORD_LIMIT]
         try:
             r = requests.post(
                 DISCORD_WEBHOOK,
                 json={"content": chunk},
                 timeout=HTTP_TIMEOUT
             )
-
             print("Discord status:", r.status_code)
-
         except Exception as e:
             print("Discord error:", e)
 
 # ================= QUERY =================
 
 def build_query():
+    """
+    BUG FIX #1: config.json must be loaded as dict default={}.
+    """
+    config = load_json(CONFIG_PATH, default={})
 
-    config = load_json(CONFIG_PATH)
+    if not config or "domains" not in config:
+        print("ERROR: config.json missing or malformed")
+        return ""
 
     material = []
     for k, v in config["domains"].items():
@@ -124,6 +175,10 @@ def build_query():
             material.extend(v)
 
     ai = config["domains"].get("ai_methods", [])
+
+    if not material or not ai:
+        print("WARNING: Empty material or ai_methods in config")
+        return ""
 
     m = "(" + " OR ".join(material[:15]) + ")"
     a = "(" + " OR ".join(ai[:10]) + ")"
@@ -133,72 +188,116 @@ def build_query():
 # ================= OPENALEX =================
 
 def fetch_openalex():
-
     results = []
+    query_str = build_query()
 
-    query = urllib.parse.quote(build_query())
+    if not query_str:
+        print("Skipping OpenAlex: empty query")
+        return results
 
+    query = urllib.parse.quote(query_str)
     url = f"https://api.openalex.org/works?search={query}&per-page=50"
 
     r = safe_get(url)
-
     if not r:
         return results
 
-    for w in r.json()["results"]:
+    try:
+        works = r.json().get("results", [])
+    except Exception as e:
+        print("OpenAlex JSON parse error:", e)
+        return results
 
+    for w in works:
         title = w.get("title")
         date = w.get("publication_date")
         doi = w.get("doi")
+        landing = w.get("primary_location", {}) or {}
+        link = landing.get("landing_page_url") or doi or ""
 
         if not title or not date:
             continue
 
-        key = normalize_key(doi)
+        # BUG FIX #2: Apply date filter
+        if not is_recent(date):
+            continue
 
+        # BUG FIX #7: Fallback to URL or title if no DOI
+        key = normalize_key(doi=doi, url=link, title=title)
         if not key or key in seen:
             continue
 
         seen.add(key)
-
         results.append({
             "source": "OpenAlex",
             "title": title,
             "date": date,
-            "url": doi
+            "url": link
         })
 
     return results
 
 # ================= NATURE RSS =================
 
-def fetch_nature():
+def is_relevant(title, config):
+    """
+    BUG FIX #3: Nature RSS returns ALL papers from general feed.
+    This checks if the paper title contains any of our keywords.
+    """
+    if not config or "domains" not in config:
+        return True  # If no config, allow everything
 
+    keywords = []
+    for k, v in config["domains"].items():
+        keywords.extend(v)
+
+    title_lower = title.lower()
+    return any(kw.lower() in title_lower for kw in keywords)
+
+def fetch_nature():
     feeds = [
-        "https://www.nature.com/nature.rss",
         "https://www.nature.com/subjects/materials-science.rss",
         "https://www.nature.com/subjects/artificial-intelligence.rss"
+        # Removed generic nature.rss — too noisy, no relevance filtering possible
     ]
 
+    config = load_json(CONFIG_PATH, default={})
     results = []
 
     for url in feeds:
-
-        feed = feedparser.parse(url)
+        try:
+            feed = feedparser.parse(url)
+        except Exception as e:
+            print(f"feedparser error on {url}: {e}")
+            continue
 
         for entry in feed.entries:
+            title = getattr(entry, "title", None)
+            link = getattr(entry, "link", None)
 
-            title = entry.title
-            date = entry.published[:10]
-            link = entry.link
+            if not title or not link:
+                continue
 
-            key = normalize_key(url=link)
+            # BUG FIX #5: entry.published may not exist — use getattr with fallback
+            raw_date = getattr(entry, "published", None) or getattr(entry, "updated", None)
+            if raw_date:
+                date = raw_date[:10]
+            else:
+                date = datetime.utcnow().strftime("%Y-%m-%d")
 
-            if key in seen:
+            # BUG FIX #2: Apply date filter
+            if not is_recent(date):
+                continue
+
+            # BUG FIX #3: Relevance filter for Nature
+            if not is_relevant(title, config):
+                continue
+
+            key = normalize_key(url=link, title=title)
+            if not key or key in seen:
                 continue
 
             seen.add(key)
-
             results.append({
                 "source": "Nature",
                 "title": title,
@@ -211,30 +310,32 @@ def fetch_nature():
 # ================= HTML =================
 
 def generate_html(data, ist):
-
     cards = ""
-
     for d in sorted(data, key=lambda x: x["date"], reverse=True):
-
+        title = d.get("title", "No Title")
+        source = d.get("source", "Unknown")
+        date = d.get("date", "")
+        url = d.get("url", "#")
         cards += f"""
-        <div class="card">
-        <b>{d['title']}</b><br>
-        Source: {d['source']}<br>
-        Date: {d['date']}<br>
-        <a href="{d['url']}" target="_blank">Open</a>
+        <div class="card" style="background:#1e293b;margin:10px 0;padding:15px;border-radius:8px;">
+        <b>{title}</b><br>
+        <span style="color:#94a3b8;">Source: {source} &nbsp;|&nbsp; Date: {date}</span><br>
+        <a href="{url}" target="_blank" style="color:#38bdf8;">Open Paper</a>
         </div>
         """
 
-    html = f"""
+    html = f"""<!DOCTYPE html>
 <html>
-<body style="background:#0f172a;color:white;font-family:Arial;padding:20px;">
-<h2>Crystal Research Intelligence</h2>
-Last sync IST: {ist}<br>
-Total papers: {len(data)}<br>
+<head>
+<meta charset="UTF-8">
+<title>Crystal Research Intelligence</title>
+</head>
+<body style="background:#0f172a;color:white;font-family:Arial;padding:20px;max-width:900px;margin:auto;">
+<h2 style="color:#38bdf8;">Crystal Research Intelligence</h2>
+<p>Last sync IST: {ist}<br>Total papers: {len(data)}</p>
 {cards}
 </body>
-</html>
-"""
+</html>"""
 
     with open(HTML_OUTPUT, "w") as f:
         f.write(html)
@@ -242,36 +343,44 @@ Total papers: {len(data)}<br>
 # ================= MAIN =================
 
 def main():
-
     utc = datetime.utcnow()
     ist = utc + timedelta(hours=5, minutes=30)
 
     new = []
-
     new += fetch_openalex()
     new += fetch_nature()
 
+    # BUG FIX #6: Check for duplicates before appending to report_data
+    existing_keys = set()
+    for item in report_data:
+        k = normalize_key(
+            doi=item.get("url"),
+            title=item.get("title")
+        )
+        if k:
+            existing_keys.add(k)
+
+    added = 0
     for n in new:
-        report_data.append(n)
+        k = normalize_key(doi=n.get("url"), title=n.get("title"))
+        if k and k not in existing_keys:
+            report_data.append(n)
+            existing_keys.add(k)
+            added += 1
 
     save_json(SEEN_FILE, list(seen))
     save_json(REPORT_DATA_FILE, report_data)
-
     generate_html(report_data, ist.strftime("%Y-%m-%d %H:%M"))
 
-    msg = f"""
-<b>Crystal Research Sync Complete</b>
+    msg = f"""<b>Crystal Research Sync Complete</b>
 
-New papers: {len(new)}
+New papers: {added}
 Total papers: {len(report_data)}
-
-Time: {ist.strftime("%Y-%m-%d %H:%M IST")}
-"""
+Time: {ist.strftime("%Y-%m-%d %H:%M IST")}"""
 
     send_telegram(msg)
     send_discord(msg)
-
-    print("Sync complete")
+    print("Sync complete. New:", added, "| Total:", len(report_data))
 
 # ================= ENTRY =================
 
