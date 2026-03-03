@@ -880,5 +880,11 @@
     "title": "\u00a0\u00a0\u00a0 Towards Sustainable Neuromorphic Computing: A Thesis on Organoid Intelligence (OI) as a Paradigm for Low-Power Biocomputing\u00a0\u00a0\u00a0",
     "journal": "OpenAlex",
     "date": "2025-10-21"
+  },
+  {
+    "source": "Nature",
+    "title": "Accurate prediction of tensorial spectra using equivariant graph neural network",
+    "date": "Mon, 2 Mar",
+    "url": "https://www.nature.com/articles/s41467-026-69159-9"
   }
 ]
