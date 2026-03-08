@@ -946,5 +946,17 @@
     "title": "A hybrid machine learning approach for reliably predicting surface roughness in CNC turning operations",
     "date": "Fri, 6 Mar",
     "url": "https://www.nature.com/articles/s41598-026-42719-1"
+  },
+  {
+    "source": "Nature",
+    "title": "System-conditioned reparameterization of the SCAN functional for accurate bandgaps: from analytical constraints to machine learning",
+    "date": "Sat, 7 Mar",
+    "url": "https://www.nature.com/articles/s41524-026-02009-w"
+  },
+  {
+    "source": "Nature",
+    "title": "Deep learning for high-resolution material texture enhancement in 3D environments",
+    "date": "Sat, 7 Mar",
+    "url": "https://www.nature.com/articles/s41598-026-42313-5"
   }
 ]
