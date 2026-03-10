@@ -958,5 +958,11 @@
     "title": "Deep learning for high-resolution material texture enhancement in 3D environments",
     "date": "Sat, 7 Mar",
     "url": "https://www.nature.com/articles/s41598-026-42313-5"
+  },
+  {
+    "source": "Nature",
+    "title": "Phase retrieval of highly strained Bragg coherent diffraction patterns using supervised convolutional neural network",
+    "date": "Mon, 9 Mar",
+    "url": "https://www.nature.com/articles/s41524-026-02017-w"
   }
 ]
