@@ -988,5 +988,11 @@
     "title": "Adaptive reinforcement learning for lithography optimization: a scalable AI-driven solution for next-generation semiconductor manufacturing",
     "date": "Sun, 15 Ma",
     "url": "https://www.nature.com/articles/s41598-026-43555-z"
+  },
+  {
+    "source": "Nature",
+    "title": "Constructing machine learning interatomic potentials with minimum amount of ab initio data",
+    "date": "Tue, 17 Ma",
+    "url": "https://www.nature.com/articles/s41524-026-02023-y"
   }
 ]
