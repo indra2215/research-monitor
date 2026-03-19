@@ -1000,5 +1000,35 @@
     "title": "Author Correction: Transferable machine learning model for multi-target nanoscale simulations in hydrogen-carbon system from crystal to amorphous",
     "date": "Tue, 17 Ma",
     "url": "https://www.nature.com/articles/s41524-026-02038-5"
+  },
+  {
+    "source": "Nature",
+    "title": "Framework to completely bypass expensive DFT calculations via graph neural networks for vacancy formation energy predictions in FCC high entropy alloys",
+    "date": "Thu, 19 Ma",
+    "url": "https://www.nature.com/articles/s41524-026-02037-6"
+  },
+  {
+    "source": "Nature",
+    "title": "Interpretable machine learning for thermoelectric materials design with Kolmogorov\u2013Arnold networks",
+    "date": "Thu, 19 Ma",
+    "url": "https://www.nature.com/articles/s41598-026-44723-x"
+  },
+  {
+    "source": "Nature",
+    "title": "Multimodal ion-gated transistor based on 2D superionic conductor for in-memory computing in deep learning",
+    "date": "Wed, 18 Ma",
+    "url": "https://www.nature.com/articles/s41467-026-70587-w"
+  },
+  {
+    "source": "Nature",
+    "title": "Deep learning modeling of oxygen redistribution and thermal transport in silicon on insulator and buried oxide layers",
+    "date": "Wed, 18 Ma",
+    "url": "https://www.nature.com/articles/s43246-026-01130-z"
+  },
+  {
+    "source": "Nature",
+    "title": "Accelerating discovery of MOFs for hydrogen storage via machine learning in energy related applications",
+    "date": "Wed, 18 Ma",
+    "url": "https://www.nature.com/articles/s41598-026-44340-8"
   }
 ]
