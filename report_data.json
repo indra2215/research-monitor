@@ -1144,5 +1144,23 @@
     "title": "Experimental and machine learning evaluation of crumb rubber concrete strength at elevated temperatures",
     "date": "Thu, 2 Apr",
     "url": "https://www.nature.com/articles/s41598-026-44147-7"
+  },
+  {
+    "source": "Nature",
+    "title": "Static magnetization switching in an artificial antiferromagnetic multilayer driven by a voltage-controlled magnetic anisotropy effect",
+    "date": "Fri, 3 Apr",
+    "url": "https://www.nature.com/articles/s41563-026-02575-w"
+  },
+  {
+    "source": "Nature",
+    "title": "Data-driven prediction of microhardness and tensile strength in microwave-sintered ZrC reinforced AA7075/SiC hybrid composites using machine learning",
+    "date": "Fri, 3 Apr",
+    "url": "https://www.nature.com/articles/s41598-026-46609-4"
+  },
+  {
+    "source": "Nature",
+    "title": "Angular relational knowledge distillation of machine learning interatomic potentials for scalable catalyst exploration",
+    "date": "Fri, 3 Apr",
+    "url": "https://www.nature.com/articles/s41524-026-02062-5"
   }
 ]
