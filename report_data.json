@@ -1204,5 +1204,23 @@
     "title": "Machine learning-based correlation of charpy impact properties between sub-sized and standard-sized specimens for nuclear structural materials",
     "date": "Thu, 9 Apr",
     "url": "https://www.nature.com/articles/s41598-026-47605-4"
+  },
+  {
+    "source": "Nature",
+    "title": "A domain-specific machine learning potential model for metallic materials spanning 53 elements",
+    "date": "Fri, 10 Ap",
+    "url": "https://www.nature.com/articles/s41524-026-02072-3"
+  },
+  {
+    "source": "Nature",
+    "title": "Impact of fabrication history induced disorder on Josephson junction reproducibility and qubit performance",
+    "date": "Fri, 10 Ap",
+    "url": "https://www.nature.com/articles/s41598-026-46352-w"
+  },
+  {
+    "source": "Nature",
+    "title": "Large-scale molecular dynamics simulations of negative thermal expansion in Bi1\u2212xLaxCoO3 using a pretrained machine learning force field",
+    "date": "Fri, 10 Ap",
+    "url": "https://www.nature.com/articles/s41598-026-47983-9"
   }
 ]
