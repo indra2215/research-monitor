@@ -1330,5 +1330,11 @@
     "title": "Mechanics-informed machine learning for predicting mechanical properties of heat-treated multi-metal alloys",
     "date": "Sun, 26 Ap",
     "url": "https://www.nature.com/articles/s41598-026-50390-9"
+  },
+  {
+    "source": "Nature",
+    "title": "Physics-informed deep learning for molecular solubility prediction: integrating thermodynamic constraints with neural network architectures",
+    "date": "Mon, 27 Ap",
+    "url": "https://www.nature.com/articles/s41598-026-49635-4"
   }
 ]
