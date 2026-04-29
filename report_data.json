@@ -1336,5 +1336,17 @@
     "title": "Physics-informed deep learning for molecular solubility prediction: integrating thermodynamic constraints with neural network architectures",
     "date": "Mon, 27 Ap",
     "url": "https://www.nature.com/articles/s41598-026-49635-4"
+  },
+  {
+    "source": "Nature",
+    "title": "Machine learning enabled unique chip feature extraction approach for semicustom delay variant PUF",
+    "date": "Tue, 28 Ap",
+    "url": "https://www.nature.com/articles/s41598-026-48490-7"
+  },
+  {
+    "source": "Nature",
+    "title": "A model for estimating the phase fraction in the microstructure of densified graphite iron (CGI) using machine learning techniques",
+    "date": "Tue, 28 Ap",
+    "url": "https://www.nature.com/articles/s41598-026-48879-4"
   }
 ]
