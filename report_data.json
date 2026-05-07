@@ -1408,5 +1408,35 @@
     "title": "Predictive modeling of drain current in advanced FET architectures using ML-based TCAD calibration",
     "date": "Tue, 5 May",
     "url": "https://www.nature.com/articles/s41598-026-48859-8"
+  },
+  {
+    "source": "Nature",
+    "title": "Machine learning modeling to predict the photocatalytic degradation rate constant in wastewater using TiO2",
+    "date": "Thu, 7 May",
+    "url": "https://www.nature.com/articles/s41598-026-51108-7"
+  },
+  {
+    "source": "Nature",
+    "title": "Physics-informed machine learning for spectrum prediction in phosphorescent OLEDs",
+    "date": "Thu, 7 May",
+    "url": "https://www.nature.com/articles/s41524-026-02078-x"
+  },
+  {
+    "source": "Nature",
+    "title": "Comparative machine learning analysis of wear characteristics in industrial waste-filled epoxy-jute composites",
+    "date": "Wed, 6 May",
+    "url": "https://www.nature.com/articles/s41598-026-52164-9"
+  },
+  {
+    "source": "Nature",
+    "title": "An advanced machine learning framework for predicting and experimentally validating Nb and Ta effects on the mechanical behavior of high-entropy alloys with reduced experimental dependency",
+    "date": "Wed, 6 May",
+    "url": "https://www.nature.com/articles/s41598-026-45211-y"
+  },
+  {
+    "source": "Nature",
+    "title": "Uncertainty aware machine learning for bridging simulation and experiment in high throughput materials characterization",
+    "date": "Wed, 6 May",
+    "url": "https://www.nature.com/articles/s41598-026-51212-8"
   }
 ]
