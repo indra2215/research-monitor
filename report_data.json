@@ -1492,5 +1492,17 @@
     "title": "A 3D printing-enabled soft continuum robot with integrated sensing for multi-purpose predictions with machine learning",
     "date": "Thu, 14 Ma",
     "url": "https://www.nature.com/articles/s41528-026-00589-7"
+  },
+  {
+    "source": "Nature",
+    "title": "Prediction of the axial capacity of various polygon-type section concrete-filled steel (CFST) columns utilising deep neural network and machine learning regressor",
+    "date": "Fri, 15 Ma",
+    "url": "https://www.nature.com/articles/s41598-026-49985-z"
+  },
+  {
+    "source": "Nature",
+    "title": "Transfer learning with graph neural networks to predict polymer solubility parameters",
+    "date": "Fri, 15 Ma",
+    "url": "https://www.nature.com/articles/s41524-026-02109-7"
   }
 ]
