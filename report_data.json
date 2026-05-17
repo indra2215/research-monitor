@@ -1504,5 +1504,11 @@
     "title": "Transfer learning with graph neural networks to predict polymer solubility parameters",
     "date": "Fri, 15 Ma",
     "url": "https://www.nature.com/articles/s41524-026-02109-7"
+  },
+  {
+    "source": "Nature",
+    "title": "Corrosion potential prediction of marine engineering steel based on machine learning",
+    "date": "Sat, 16 Ma",
+    "url": "https://www.nature.com/articles/s41529-026-00809-5"
   }
 ]
