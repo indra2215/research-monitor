@@ -1510,5 +1510,29 @@
     "title": "Corrosion potential prediction of marine engineering steel based on machine learning",
     "date": "Sat, 16 Ma",
     "url": "https://www.nature.com/articles/s41529-026-00809-5"
+  },
+  {
+    "source": "Nature",
+    "title": "Physics-informed graph neural network representation learning for crystal property prediction",
+    "date": "Mon, 18 Ma",
+    "url": "https://www.nature.com/articles/s41524-026-02131-9"
+  },
+  {
+    "source": "Nature",
+    "title": "Integrated experimental design and machine learning framework for predicting UV influenced mechanical properties in polyurethane nanodiamond nanocomposites",
+    "date": "Mon, 18 Ma",
+    "url": "https://www.nature.com/articles/s41598-026-49606-9"
+  },
+  {
+    "source": "Nature",
+    "title": "Unlocking stable iodine capture in 2D COFs: insights from DFT combined with multiscale\u2212descriptors\u2212driven machine learning",
+    "date": "Mon, 18 Ma",
+    "url": "https://www.nature.com/articles/s41524-026-02121-x"
+  },
+  {
+    "source": "Nature",
+    "title": "Machine learning approach for mechanical property assessment of industrial waste-filled epoxy\u2013jute composites",
+    "date": "Mon, 18 Ma",
+    "url": "https://www.nature.com/articles/s41598-026-53330-9"
   }
 ]
