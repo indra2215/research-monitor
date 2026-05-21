@@ -1546,5 +1546,23 @@
     "title": "Design topological materials by reinforcement fine-tuned generative model",
     "date": "Tue, 19 Ma",
     "url": "https://www.nature.com/articles/s41467-026-73321-8"
+  },
+  {
+    "source": "Nature",
+    "title": "The diffusion-driven orthorhombic to tetragonal transition in YBa2Cu3O7 derived with a machine learning interatomic potential",
+    "date": "Thu, 21 Ma",
+    "url": "https://www.nature.com/articles/s41535-026-00891-7"
+  },
+  {
+    "source": "Nature",
+    "title": "Deep neural network for phonon-assisted optical spectra of semiconductors at finite temperatures",
+    "date": "Wed, 20 Ma",
+    "url": "https://www.nature.com/articles/s41524-026-02137-3"
+  },
+  {
+    "source": "Nature",
+    "title": "Exploring lithium diffusion in LiF with machine learning potentials: from point defects to collective ring diffusion",
+    "date": "Wed, 20 Ma",
+    "url": "https://www.nature.com/articles/s41524-026-02132-8"
   }
 ]
