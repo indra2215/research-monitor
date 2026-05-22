@@ -1564,5 +1564,17 @@
     "title": "Exploring lithium diffusion in LiF with machine learning potentials: from point defects to collective ring diffusion",
     "date": "Wed, 20 Ma",
     "url": "https://www.nature.com/articles/s41524-026-02132-8"
+  },
+  {
+    "source": "Nature",
+    "title": "A properties prediction strategy of aluminum anode foils through machine learning based on feature selection and stacking learning models",
+    "date": "Thu, 21 Ma",
+    "url": "https://www.nature.com/articles/s41598-026-52156-9"
+  },
+  {
+    "source": "Nature",
+    "title": "Ductile Mg-Te-Pb thermoelectric materials with ultralow lattice thermal conductivity predicted by a deep learning potential model",
+    "date": "Thu, 21 Ma",
+    "url": "https://www.nature.com/articles/s41524-026-02149-z"
   }
 ]
