@@ -1636,5 +1636,29 @@
     "title": "Cross-material catalyst discovery via deep learning",
     "date": "Thu, 28 Ma",
     "url": "https://www.nature.com/articles/s41563-026-02622-6"
+  },
+  {
+    "source": "Nature",
+    "title": "Unveiling bootstrap uncertainty bias: understanding bagging efficiency over Gaussian processes in materials active learning",
+    "date": "Fri, 29 Ma",
+    "url": "https://www.nature.com/articles/s41524-026-02157-z"
+  },
+  {
+    "source": "Nature",
+    "title": "Predictive analysis on mechanical properties, material flow and thermal analysis of friction stir welded dissimilar AA2014/AA7075 Al-alloy joints using machine learning",
+    "date": "Fri, 29 Ma",
+    "url": "https://www.nature.com/articles/s41598-026-48688-9"
+  },
+  {
+    "source": "Nature",
+    "title": "MEIDNet: multimodal generative AI framework for inverse materials design",
+    "date": "Fri, 29 Ma",
+    "url": "https://www.nature.com/articles/s41524-026-02153-3"
+  },
+  {
+    "source": "Nature",
+    "title": "Generating knotted polymer and protein structures by machine learning",
+    "date": "Fri, 29 Ma",
+    "url": "https://www.nature.com/articles/s42004-026-02082-8"
   }
 ]
