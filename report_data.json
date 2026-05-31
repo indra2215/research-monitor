@@ -1660,5 +1660,17 @@
     "title": "Generating knotted polymer and protein structures by machine learning",
     "date": "Fri, 29 Ma",
     "url": "https://www.nature.com/articles/s42004-026-02082-8"
+  },
+  {
+    "source": "Nature",
+    "title": "Neural network self-consistent fields for density functional theory",
+    "date": "Sat, 30 Ma",
+    "url": "https://www.nature.com/articles/s41524-026-02110-0"
+  },
+  {
+    "source": "Nature",
+    "title": "Determinants of protein corona adsorption and abundance revealed by interpretable machine learning across nanoparticle systems",
+    "date": "Sat, 30 Ma",
+    "url": "https://www.nature.com/articles/s41598-026-55258-6"
   }
 ]
