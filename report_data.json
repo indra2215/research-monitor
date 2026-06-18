@@ -1750,5 +1750,23 @@
     "title": "Uncertainty-aware prediction of the glass transition temperature of aliphatic polycarbonates using ensemble machine learning",
     "date": "Tue, 16 Ju",
     "url": "https://www.nature.com/articles/s41428-026-01208-y"
+  },
+  {
+    "source": "Nature",
+    "title": "Predicting corrosion degradation of power system equipment in high humidity environment using XGBoost algorithm with a coupled environmental operational modeling approach",
+    "date": "Thu, 18 Ju",
+    "url": "https://www.nature.com/articles/s41598-026-57484-4"
+  },
+  {
+    "source": "Nature",
+    "title": "Mechanical and flexural fatigue behaviour of steel fibre reinforced RAP-based concrete: experimental and machine learning investigation",
+    "date": "Thu, 18 Ju",
+    "url": "https://www.nature.com/articles/s41598-026-58324-1"
+  },
+  {
+    "source": "Nature",
+    "title": "Leveraging neural network interatomic potentials for a foundation model of chemistry",
+    "date": "Wed, 17 Ju",
+    "url": "https://www.nature.com/articles/s41524-026-02167-x"
   }
 ]
