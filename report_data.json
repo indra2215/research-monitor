@@ -1858,5 +1858,17 @@
     "title": "Predictive modeling of Z-shaped gate source pocket TFET using machine learning and TCAD simulation data",
     "date": "Tue, 7 Jul",
     "url": "https://www.nature.com/articles/s41598-026-60414-z"
+  },
+  {
+    "source": "Nature",
+    "title": "Predicting slip transmission pathways using graph neural networks",
+    "date": "Wed, 8 Jul",
+    "url": "https://www.nature.com/articles/s41524-026-02218-3"
+  },
+  {
+    "source": "Nature",
+    "title": "Machine learning screening the feasibility for self-propagating reactions of the MAX and MAB phases with ab initio dataset",
+    "date": "Tue, 7 Jul",
+    "url": "https://www.nature.com/articles/s41524-026-02216-5"
   }
 ]
