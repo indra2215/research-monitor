@@ -1966,5 +1966,23 @@
     "title": "Reinforcement learning steers generative crystal design",
     "date": "Mon, 3 Aug",
     "url": "https://www.nature.com/articles/s42256-026-01282-0"
+  },
+  {
+    "source": "Nature",
+    "title": "Machine learning force field molecular dynamics simulation of SEI formation on lithium metal",
+    "date": "Fri, 7 Aug",
+    "url": "https://www.nature.com/articles/s41524-026-02271-y"
+  },
+  {
+    "source": "Nature",
+    "title": "Graph neural network surrogate enables multi-zone elastic modulus inversion in ultra-high arch dams",
+    "date": "Thu, 6 Aug",
+    "url": "https://www.nature.com/articles/s41598-026-61156-8"
+  },
+  {
+    "source": "Nature",
+    "title": "Machine learning force field molecular dynamics simulation of interfacial reactions on platinum in concentrated aqueous electrolytes",
+    "date": "Thu, 6 Aug",
+    "url": "https://www.nature.com/articles/s41524-026-02260-1"
   }
 ]
