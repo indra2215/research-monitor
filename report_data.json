@@ -1984,5 +1984,11 @@
     "title": "Machine learning force field molecular dynamics simulation of interfacial reactions on platinum in concentrated aqueous electrolytes",
     "date": "Thu, 6 Aug",
     "url": "https://www.nature.com/articles/s41524-026-02260-1"
+  },
+  {
+    "source": "Nature",
+    "title": "Interpretable machine learning for Curie temperature prediction of magnetic materials: compositional descriptors, shap analysis, and a perovskite case study",
+    "date": "Wed, 12 Au",
+    "url": "https://www.nature.com/articles/s41598-026-65391-x"
   }
 ]
