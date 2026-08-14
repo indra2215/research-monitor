@@ -1990,5 +1990,23 @@
     "title": "Interpretable machine learning for Curie temperature prediction of magnetic materials: compositional descriptors, shap analysis, and a perovskite case study",
     "date": "Wed, 12 Au",
     "url": "https://www.nature.com/articles/s41598-026-65391-x"
+  },
+  {
+    "source": "Nature",
+    "title": "Innovative development of an advanced machine learning modeling for predicting compressive strength of graphene-infused concrete: a SHAP and PDP approach",
+    "date": "Fri, 14 Au",
+    "url": "https://www.nature.com/articles/s41598-026-66152-6"
+  },
+  {
+    "source": "Nature",
+    "title": "Accurate SEM-EDS quantification, automation, and machine learning enable high-throughput compositional characterization of powders",
+    "date": "Thu, 13 Au",
+    "url": "https://www.nature.com/articles/s41467-026-76633-x"
+  },
+  {
+    "source": "Nature",
+    "title": "Mixture of experts architectures for machine learning interatomic potentials",
+    "date": "Thu, 13 Au",
+    "url": "https://www.nature.com/articles/s44387-026-00144-9"
   }
 ]
