@@ -2020,5 +2020,17 @@
     "title": "Dual-additive enabled inorganic-rich solid electrolyte interphase for high-rate lithium negative electrodes",
     "date": "Fri, 14 Au",
     "url": "https://www.nature.com/articles/s41467-026-76653-7"
+  },
+  {
+    "source": "Nature",
+    "title": "MatUQ: a benchmark for uncertainty-aware out-of-distribution materials property prediction with graph neural networks",
+    "date": "Sat, 15 Au",
+    "url": "https://www.nature.com/articles/s41524-026-02272-x"
+  },
+  {
+    "source": "Nature",
+    "title": "Machine learning-driven optimization of high-velocity impact resistance for three-dimensional biphasic composites",
+    "date": "Sat, 15 Au",
+    "url": "https://www.nature.com/articles/s41467-026-76632-y"
   }
 ]
