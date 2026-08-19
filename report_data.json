@@ -2050,5 +2050,17 @@
     "title": "A supervised machine learning approach with dual GAN augmentation and Bayesian HPO for corrosion prediction of Mg-Li alloys",
     "date": "Mon, 17 Au",
     "url": "https://www.nature.com/articles/s41529-026-00859-9"
+  },
+  {
+    "source": "Nature",
+    "title": "Interpretable machine learning reveals a morphological regime shift governing pitting resistance in steam-coated boehmite films",
+    "date": "Tue, 18 Au",
+    "url": "https://www.nature.com/articles/s41529-026-00862-0"
+  },
+  {
+    "source": "Nature",
+    "title": "Experimental measurement and machine learning modeling of BBOT solubility in supercritical carbon dioxide",
+    "date": "Tue, 18 Au",
+    "url": "https://www.nature.com/articles/s41598-026-66404-5"
   }
 ]
