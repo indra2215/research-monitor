@@ -2158,5 +2158,17 @@
     "title": "Machine learning driven multi-property prediction for rare earth permanent magnet materials",
     "date": "Tue, 1 Sep",
     "url": "https://www.nature.com/articles/s41524-026-02299-0"
+  },
+  {
+    "source": "Nature",
+    "title": "Accelerated stable structure prediction of Li-intercalated bilayer graphene using a data-efficient deep learning framework",
+    "date": "Fri, 4 Sep",
+    "url": "https://www.nature.com/articles/s41524-026-02314-4"
+  },
+  {
+    "source": "Nature",
+    "title": "Field-aware and charge-informed machine learning for predicting molecular and condensed-phase responses and vibrational spectra",
+    "date": "Fri, 4 Sep",
+    "url": "https://www.nature.com/articles/s41524-026-02293-6"
   }
 ]
