@@ -2218,5 +2218,17 @@
     "title": "AI-accelerated discovery of altermagnetic metal-organic frameworks via interpretable machine learning",
     "date": "Mon, 14 Se",
     "url": "https://www.nature.com/articles/s41524-026-02323-3"
+  },
+  {
+    "source": "Nature",
+    "title": "A physics-informed neural network approach to diffusion and auto-oxidation in Fricke gel dosimeters",
+    "date": "Wed, 16 Se",
+    "url": "https://www.nature.com/articles/s41598-026-70154-9"
+  },
+  {
+    "source": "Nature",
+    "title": "Prediction of vacancy formation energies in Ni-based superalloys by density functional theory calculations and machine learning",
+    "date": "Tue, 15 Se",
+    "url": "https://www.nature.com/articles/s41524-026-02284-7"
   }
 ]
