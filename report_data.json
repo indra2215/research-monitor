@@ -2320,5 +2320,17 @@
     "title": "Mixture replication in benchmark datasets inflates reported machine learning performance and degrades prediction interval coverage for ultra-high-performance concrete",
     "date": "Thu, 24 Se",
     "url": "https://www.nature.com/articles/s41598-026-70561-y"
+  },
+  {
+    "source": "Nature",
+    "title": "Machine learning-enabled prediction and interpretation of spectroscopic properties in Nd and Y co-doped fluorite platform via local coordination engineering",
+    "date": "Tue, 29 Se",
+    "url": "https://www.nature.com/articles/s41524-026-02234-3"
+  },
+  {
+    "source": "Nature",
+    "title": "Explainable and MOWCA-optimized machine learning for compressive strength prediction and counterfactual mixture design of GGBS concrete",
+    "date": "Mon, 28 Se",
+    "url": "https://www.nature.com/articles/s41598-026-72886-0"
   }
 ]
