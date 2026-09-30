@@ -2332,5 +2332,17 @@
     "title": "Explainable and MOWCA-optimized machine learning for compressive strength prediction and counterfactual mixture design of GGBS concrete",
     "date": "Mon, 28 Se",
     "url": "https://www.nature.com/articles/s41598-026-72886-0"
+  },
+  {
+    "source": "Nature",
+    "title": "Generative design of high-fidelity microstructures using physics-aware machine learning",
+    "date": "Wed, 30 Se",
+    "url": "https://www.nature.com/articles/s41467-026-78118-3"
+  },
+  {
+    "source": "Nature",
+    "title": "A high performance CALPHAD data engine for scalable ICME and AI-assisted materials design",
+    "date": "Tue, 29 Se",
+    "url": "https://www.nature.com/articles/s41598-026-73329-6"
   }
 ]
