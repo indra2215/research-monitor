@@ -2356,5 +2356,35 @@
     "title": "Unsupervised machine learning for automated crystal orientation mapping on noisy 4D-STEM data",
     "date": "Sat, 3 Oct",
     "url": "https://www.nature.com/articles/s41524-026-02337-x"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Superconducting artificial neural networks and quantum circuits",
+    "date": "2026-06-08",
+    "url": "https://doi.org/10.3762/bjnano.17.51"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Experimental robustness benchmarking of quantum neural networks on a superconducting quantum processor",
+    "date": "2026-04-27",
+    "url": "https://doi.org/10.1007/s11433-025-2943-6"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Real-Time Detection of Charge Jumps in Superconducting Qubits with a Convolutional Neural Network",
+    "date": "2026-07-15",
+    "url": "https://arxiv.org/abs/2607.14293"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Nanoscale Electrothermal-Switch Superconducting Diode for Electrically Programmable Superconducting Circuits",
+    "date": "2026-04-14",
+    "url": "https://doi.org/10.1021/acs.nanolett.6c00080"
+  },
+  {
+    "source": "Nature",
+    "title": "Physics-grounded machine learning for inverse design of TiO2/CuInGaS2/rGO\u2013CuxS quantum-dot solar cells using surrogate modeling and SCAPS-based validation",
+    "date": "Sat, 3 Oct",
+    "url": "https://www.nature.com/articles/s41598-026-73752-9"
   }
 ]
