@@ -2386,5 +2386,17 @@
     "title": "Physics-grounded machine learning for inverse design of TiO2/CuInGaS2/rGO\u2013CuxS quantum-dot solar cells using surrogate modeling and SCAPS-based validation",
     "date": "Sat, 3 Oct",
     "url": "https://www.nature.com/articles/s41598-026-73752-9"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Machine learning-assisted noise characterization and entanglement verification in superconducting qubits",
+    "date": "2026-10-08",
+    "url": "https://doi.org/10.3389/frai.2026.1869591"
+  },
+  {
+    "source": "Nature",
+    "title": "Machine learning prediction of compressive and flexural strength of plastic aggregate concrete using DGAN-augmented data",
+    "date": "Fri, 9 Oct",
+    "url": "https://www.nature.com/articles/s41598-026-73599-0"
   }
 ]
