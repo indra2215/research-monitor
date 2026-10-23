@@ -2500,5 +2500,11 @@
     "title": "Image feature-based machine learning for non-destructive corrosion assessment of weathering steel along a railway line in southwestern China",
     "date": "Wed, 21 Oc",
     "url": "https://www.nature.com/articles/s41529-026-00890-w"
+  },
+  {
+    "source": "Nature",
+    "title": "Intelligent prediction of eco-concrete compressive strength based on SHAP-interpretable BO-XGBoost and NSGA-II multi-objective optimization",
+    "date": "Fri, 23 Oc",
+    "url": "https://www.nature.com/articles/s41598-026-77562-x"
   }
 ]
