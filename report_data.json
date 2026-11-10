@@ -2602,5 +2602,17 @@
     "title": "Impact of the glass transition temperature on Li-ion diffusion in amorphous alloy anodes via machine learning",
     "date": "Sat, 7 Nov",
     "url": "https://www.nature.com/articles/s41524-026-02383-5"
+  },
+  {
+    "source": "Nature",
+    "title": "Aligning heterogeneous DFT datasets: a graph neural network approach to cross-functional formation energies",
+    "date": "Tue, 10 No",
+    "url": "https://www.nature.com/articles/s41524-026-02366-6"
+  },
+  {
+    "source": "Nature",
+    "title": "Physics\u2013informed multimodal deep learning for real-time defect detection and process monitoring in solid-state additive manufacturing",
+    "date": "Tue, 10 No",
+    "url": "https://www.nature.com/articles/s41598-026-74963-w"
   }
 ]
