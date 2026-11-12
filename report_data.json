@@ -2614,5 +2614,29 @@
     "title": "Physics\u2013informed multimodal deep learning for real-time defect detection and process monitoring in solid-state additive manufacturing",
     "date": "Tue, 10 No",
     "url": "https://www.nature.com/articles/s41598-026-74963-w"
+  },
+  {
+    "source": "Nature",
+    "title": "Generative inverse estimation of 3D atomic coordination from near-edge spectra via equivariant diffusion models",
+    "date": "Thu, 12 No",
+    "url": "https://www.nature.com/articles/s41524-026-02384-4"
+  },
+  {
+    "source": "Nature",
+    "title": "Physics-regularized neural network and multi-objective optimization for sustainable multi-binder concrete mix design",
+    "date": "Thu, 12 No",
+    "url": "https://www.nature.com/articles/s41598-026-80311-9"
+  },
+  {
+    "source": "Nature",
+    "title": "Adaptive structural fusion for dielectric constant prediction using physics-guided graph neural networks",
+    "date": "Thu, 12 No",
+    "url": "https://www.nature.com/articles/s41598-026-78263-1"
+  },
+  {
+    "source": "Nature",
+    "title": "Estimation of the dielectric constant of polymer melts by machine learning incorporating higher-order structural descriptors based on persistent homology",
+    "date": "Thu, 12 No",
+    "url": "https://www.nature.com/articles/s41428-026-01266-2"
   }
 ]
