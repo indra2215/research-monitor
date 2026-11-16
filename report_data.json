@@ -2656,5 +2656,35 @@
     "title": "Predicting Intergranular Corrosion Penetration Depth in Accelerated Testing using Machine Learning",
     "date": "Sun, 15 No",
     "url": "https://www.nature.com/articles/s41529-026-00912-7"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Towards the discovery of high critical magnetic field superconductors",
+    "date": "2026-08-12",
+    "url": "https://doi.org/10.1038/s41524-026-02266-9"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Exploring the behavior of superconductors and Josephson junctions: temperature and current effects by RCSJ model",
+    "date": "2026-05-25",
+    "url": "https://doi.org/10.3126/bibechana.v23i2.85514"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Pressure Sensitivity Classification and Comparative Analysis Across Superconductor Families from Cuprates to Conventional BCS Systems",
+    "date": "2026-09-04",
+    "url": "https://doi.org/10.62292/njp.v35(s).2026.721"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Generating is not discovering: a pre-registered physics judge for AI-proposed superconductors, calibrated on six known superconductors and one negative control",
+    "date": "2026-09-08",
+    "url": "https://arxiv.org/abs/2609.10614"
+  },
+  {
+    "source": "Nature",
+    "title": "AI-based non-destructive food screening for detecting calcium carbide (CaC2)-treated bananas",
+    "date": "Sun, 15 No",
+    "url": "https://www.nature.com/articles/s41598-026-79484-0"
   }
 ]
