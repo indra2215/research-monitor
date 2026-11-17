@@ -2686,5 +2686,35 @@
     "title": "AI-based non-destructive food screening for detecting calcium carbide (CaC2)-treated bananas",
     "date": "Sun, 15 No",
     "url": "https://www.nature.com/articles/s41598-026-79484-0"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Machine-accelerated extraction of experimental superconducting parameters for physical insight and prediction across thousands of materials",
+    "date": "2026-11-11",
+    "url": "https://arxiv.org/abs/2611.15627"
+  },
+  {
+    "source": "OpenAlex",
+    "title": "Comprehensive review on superconducting cable technologies, designs, applications, and future trends",
+    "date": "2026-11-13",
+    "url": "https://doi.org/10.1016/j.nxener.2026.101185"
+  },
+  {
+    "source": "Nature",
+    "title": "Dual-mode plasmonic nanosensor with high sensitivity and RBF neural network-assisted lactate detection",
+    "date": "Tue, 17 No",
+    "url": "https://www.nature.com/articles/s41598-026-78693-x"
+  },
+  {
+    "source": "Nature",
+    "title": "WCIP-based modeling and deep neural network\u2013driven optimization of a terahertz sensor for IoT-enabled green hydrogen monitoring",
+    "date": "Tue, 17 No",
+    "url": "https://www.nature.com/articles/s41598-026-77548-9"
+  },
+  {
+    "source": "Nature",
+    "title": "Unlocking cycle life of lithium-metal batteries",
+    "date": "Mon, 16 No",
+    "url": "https://www.nature.com/articles/s44287-026-00356-w"
   }
 ]
