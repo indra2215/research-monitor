@@ -2722,5 +2722,23 @@
     "title": "Predicting spin-crossover behavior in metal-organic frameworks from limited and noisy data using quantile active learning",
     "date": "Wed, 18 No",
     "url": "https://www.nature.com/articles/s41524-026-02365-7"
+  },
+  {
+    "source": "Nature",
+    "title": "An explainable hybrid machine learning framework for predicting rapid chloride permeability in durable concrete",
+    "date": "Thu, 19 No",
+    "url": "https://www.nature.com/articles/s41598-026-80431-2"
+  },
+  {
+    "source": "Nature",
+    "title": "Sensitivity analysis and physics-aware deep learning for aluminum mirror coatings: when network architecture outweighs loss-function design",
+    "date": "Thu, 19 No",
+    "url": "https://www.nature.com/articles/s41598-026-80680-1"
+  },
+  {
+    "source": "Nature",
+    "title": "Sustainable low-carbon concrete evaluation through electrochemical impedance spectroscopy and data-driven modeling",
+    "date": "Thu, 19 No",
+    "url": "https://www.nature.com/articles/s41598-026-80906-2"
   }
 ]
