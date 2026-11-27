@@ -2770,5 +2770,23 @@
     "title": "Accelerating inverse materials design using generative diffusion models with reinforcement learning",
     "date": "Thu, 26 No",
     "url": "https://www.nature.com/articles/s42256-026-01334-5"
+  },
+  {
+    "source": "Nature",
+    "title": "Causal discovery guided machine learning framework for optimizing sustainable concrete mix design using GGBS and microsilica",
+    "date": "Fri, 27 No",
+    "url": "https://www.nature.com/articles/s41598-026-78548-5"
+  },
+  {
+    "source": "Nature",
+    "title": "Explainable machine learning for predicting rheological and mechanical properties of 3D-printed concrete",
+    "date": "Fri, 27 No",
+    "url": "https://www.nature.com/articles/s41598-026-80925-z"
+  },
+  {
+    "source": "Nature",
+    "title": "Towards scalable manufacturing of laminated Perovskite solar cells through automated rolling and Bayesian optimization",
+    "date": "Fri, 27 No",
+    "url": "https://www.nature.com/articles/s44334-026-00121-9"
   }
 ]
